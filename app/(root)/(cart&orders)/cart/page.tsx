@@ -1,7 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react";
-import { GetCartItemsFromLocalStorage, RemoveCartItemFromLocalStorage } from "@/lib/actions";
+import { ClearCartFromLocalStorage, GetCartItemsFromLocalStorage, RemoveCartItemFromLocalStorage } from "@/lib/actions";
+import { ConfirmOrder } from "@/lib/order-actions";
 import { client } from "@/sanity/lib/client";
 import { CART_DISHES_QUERY } from "@/sanity/lib/query";
 
@@ -23,6 +24,8 @@ type CartItem = {
 export default function CartPage() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
 
   useEffect(() => {
     let isActive = true;
@@ -90,12 +93,38 @@ export default function CartPage() {
   }, []);
 
   const handleRemove = (cartIndex: number) => {
+    setMessage(null);
     RemoveCartItemFromLocalStorage(cartIndex);
+  };
+
+  const totalPrice = cartItems.reduce((total, { dish }) => total + (dish.price ?? 0), 0);
+
+  const handleConfirmOrder = async () => {
+    const slugs = GetCartItemsFromLocalStorage();
+
+    if (slugs.length === 0) {
+      setMessage("Your cart is empty.");
+      return;
+    }
+
+    setSubmitting(true);
+    setMessage(null);
+
+    try {
+      await ConfirmOrder(slugs);
+      ClearCartFromLocalStorage();
+      setMessage("Order confirmed successfully.");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "Order confirmation failed.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
     <main className="main">
       <h1>Cart</h1>
+      {message ? <p>{message}</p> : null}
 
       {loading ? (
         <p>Loading cart...</p>
@@ -114,12 +143,19 @@ export default function CartPage() {
                   <p>{dish.isAvailable ? "Available" : "Not available"}</p>
                 </div>
 
-                <button onClick={() => handleRemove(cartIndex)}>
+                <button onClick={() => handleRemove(cartIndex)} disabled={submitting}>
                   Remove
                 </button>
               </div>
             </div>
           ))}
+
+          <div className="rounded-xl border p-4">
+            <p>Total: {totalPrice} EUR</p>
+            <button onClick={handleConfirmOrder} disabled={submitting}>
+              {submitting ? "Confirming..." : "Confirm order"}
+            </button>
+          </div>
         </div>
       )}
     </main>

@@ -67,3 +67,7 @@ export function RemoveCartItemFromLocalStorage(indexToRemove: number) {
 
     return updatedCart;
 }
+
+export function ClearCartFromLocalStorage() {
+    writeCartToLocalStorage([]);
+}

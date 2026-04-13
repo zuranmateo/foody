@@ -12,7 +12,7 @@ export default async function Navbar() {
       <nav className="shadow-2xl">
             <Link href="/" className="flex justify-between">
                 <Image
-                  src="/logoName.png"
+                  src="/defaultProfileImg.png"
                   alt="logo"
                   width={150}
                   height={75}
@@ -31,7 +31,7 @@ export default async function Navbar() {
                 <Link href="/cart">
                   <KartNumber/>
                 </Link>
-                <Link href={`/profile/${session?.user?._id}`} className="flex justify-between items-center mr-5">
+                <Link href={`/user/${session?.user?._id}`} className="flex justify-between items-center mr-5">
                   <span className="text-base md:text-base lg:text-xl">
                     {session?.user?.name}
                   </span>

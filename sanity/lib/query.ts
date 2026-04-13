@@ -80,8 +80,8 @@ export const POPULAR_DISHES_QUERY = defineQuery(`
    }
 `)
 
-export const PIZZA_DISHES_QUERY = defineQuery(`
-   *[_type == "dishes" && category == "pizza"]{
+export const CATEGORY_DISHES_QUERY = defineQuery(`
+   *[_type == "dishes" && category == $category]{
       _id,
       name,
       "slug": slug.current,
@@ -125,5 +125,48 @@ export const CART_DISHES_QUERY = defineQuery(`
       preparationTime,
       isPopular,
       isAvailable,
+   }
+`)
+
+export const ORDER_DISHES_QUERY = defineQuery(`
+   *[_type == "dishes" && slug.current in $slugs]{
+      _id,
+      name,
+      "slug": slug.current,
+      price
+   }
+`)
+
+export const PROFILE_USER_QUERY = defineQuery(`
+   *[_type == "users" && _id == $id][0]{
+      _id,
+      id,
+      name,
+      surname,
+      email,
+      phone,
+      address,
+      role,
+      "image": image.asset->url,
+      imageUrl,
+      _createdAt
+   }
+`)
+
+export const USER_ORDERS_QUERY = defineQuery(`
+   *[_type == "orders" && user._ref == $id] | order(_createdAt desc){
+      _id,
+      _createdAt,
+      totalPrice,
+      status,
+      items[]{
+         quantity,
+         dish->{
+            _id,
+            name,
+            "slug": slug.current,
+            price
+         }
+      }
    }
 `)

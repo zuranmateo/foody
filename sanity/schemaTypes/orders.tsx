@@ -48,11 +48,6 @@ export const orders = defineType({
         list: ['pending', 'preparing', 'delivered']
       }
     }),
-    defineField({
-      name: 'createdAt',
-      title: 'Datum',
-      type: 'datetime'
-    })
   ],
   preview: {
     select: {
