@@ -21,11 +21,13 @@ export const orders = defineType({
           fields: [
             defineField({
               name: 'dish',
+              title: 'Dish',
               type: 'reference',
               to: [{ type: 'dishes' }]
             }),
             defineField({
               name: 'quantity',
+              title: 'Koliko',
               type: 'number'
             })
           ]

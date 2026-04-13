@@ -56,16 +56,71 @@ export const CHECK_FOR_ID_QUERY = defineQuery(`
    }
 `)
 
-
 export const POPULAR_DISHES_QUERY = defineQuery(`
    *[_type == "dishes" && isPopular == true]{
       _id,
       name,
-      slug,
+      "slug": slug.current,
       description,
       price,
       image,
-      ingredients[] -> {name, quantity, unit, inStock},
+      ingredients[]{
+         quantity,
+         ingredient->{
+            name,
+            quantity,
+            unit,
+            inStock
+         }
+      },
+      category,
+      preparationTime,
+      isPopular,
+      isAvailable,
+   }
+`)
+
+export const PIZZA_DISHES_QUERY = defineQuery(`
+   *[_type == "dishes" && category == "pizza"]{
+      _id,
+      name,
+      "slug": slug.current,
+      description,
+      price,
+      image,
+      ingredients[]{
+         quantity,
+         ingredient->{
+            name,
+            quantity,
+            unit,
+            inStock
+         }
+      },
+      category,
+      preparationTime,
+      isPopular,
+      isAvailable,
+   }
+`)
+
+export const CART_DISHES_QUERY = defineQuery(`
+   *[_type == "dishes" && slug.current in $slugs]{
+      _id,
+      name,
+      "slug": slug.current,
+      description,
+      price,
+      image,
+      ingredients[]{
+         quantity,
+         ingredient->{
+            name,
+            quantity,
+            unit,
+            inStock
+         }
+      },
       category,
       preparationTime,
       isPopular,
