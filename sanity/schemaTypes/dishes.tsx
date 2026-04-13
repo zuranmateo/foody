@@ -37,7 +37,41 @@ export const dishes = defineType({
       name: 'ingredients',
       title: 'Sestavine',
       type: 'array',
-      of: [{ type: 'reference', to: [{ type: 'ingredients' }] }]
+      of: [
+        defineField({
+          name: 'ingredientItem',
+          title: 'Sestavina',
+          type: 'object',
+          fields: [
+            defineField({
+              name: 'ingredient',
+              title: 'Sestavina',
+              type: 'reference',
+              to: [{ type: 'ingredients' }],
+              validation: Rule => Rule.required()
+            }),
+            defineField({
+              name: 'quantity',
+              title: 'Potrebna količina',
+              type: 'number',
+              validation: Rule => Rule.required().min(0)
+            })
+          ],
+          preview: {
+            select: {
+              title: 'ingredient.name',
+              quantity: 'quantity',
+              unit: 'ingredient.unit'
+            },
+            prepare({ title, quantity, unit }) {
+              return {
+                title: title || 'Sestavina',
+                subtitle: quantity !== undefined ? `${quantity} ${unit || ''}`.trim() : 'Brez količine'
+              }
+            }
+          }
+        })
+      ]
     }),
     defineField({
       name: 'category',

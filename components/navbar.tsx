@@ -1,16 +1,18 @@
 import Link from "next/link"
 import Image from "next/image"
 import { auth, signOut } from "@/auth"
+import KartNumber from "./ui/KartNumber";
+import { SanityLive } from '@/sanity/lib/live';
 
 export default async function Navbar() {
 
   const session = await auth();
 
   return (
-      <nav className="navbar">
+      <nav className="shadow-2xl">
             <Link href="/" className="flex justify-between">
                 <Image
-                  src="/logoName.png"
+                  src="/defaultProfileImg.png"
                   alt="logo"
                   width={150}
                   height={75}
@@ -23,19 +25,13 @@ export default async function Navbar() {
             {session && session?.user ?
             (
               <>
-                <Link href="/order">
-                  <span className="block bg-primary text-white py-2 px-4 lg:text-xl md:text-sm text-sm rounded-xl">NAROČI ANALIZO</span>
+                <Link href="/menu">
+                  <span className="block bg-primary text-white py-2 px-4 lg:text-xl md:text-sm text-sm rounded-xl">MENI</span>
                 </Link>
-
-                <form action={async() => {
-                  "use server"
-                  await signOut({ redirectTo: "/" });
-                }}>
-                  <button type="submit" name="logout" className="cursor-pointer text-base lg:text-xl">
-                    Logout
-                  </button>
-                </form>
-                <Link href={`/profile/${session?.user?._id}`} className="flex justify-between items-center mr-5">
+                <Link href="/cart">
+                  <KartNumber/>
+                </Link>
+                <Link href={`/user/${session?.user?._id}`} className="flex justify-between items-center mr-5">
                   <span className="text-base md:text-base lg:text-xl">
                     {session?.user?.name}
                   </span>
@@ -50,6 +46,18 @@ export default async function Navbar() {
             </button>
           )}
         </div>
+        <SanityLive />
       </nav>
   );
 }
+
+/**signout koda
+ * <form action={async() => {
+                  "use server"
+                  await signOut({ redirectTo: "/" });
+                }}>
+                  <button type="submit" name="logout" className="cursor-pointer text-base lg:text-xl">
+                    Logout
+                  </button>
+                </form>
+ */

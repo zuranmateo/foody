@@ -2,7 +2,7 @@
 import { AddToCart } from '@/lib/actions'
 import React, { useState } from 'react'
 
-export default function DishCard({dish}: {dish: any}){
+export default function DishCard({dish, isLoggedIn}: {dish: any, isLoggedIn: boolean}){
 
   const [loading, setLoading] = useState(false);
 
@@ -24,7 +24,9 @@ export default function DishCard({dish}: {dish: any}){
             {/**description, price, image, (ingrediants bom js, ti samo naredi plac), preparationTime, isPopular, isAvailable */}
         </div>
         <div>
-            <button onClick={handleAddToCart} disabled={loading}>{loading ? "adding..." : "add to cart"}</button>
+            {isLoggedIn ? (
+              <button onClick={handleAddToCart} disabled={loading}>{loading ? "adding..." : "add to cart"}</button>
+            ) : null}
         </div>
     </div>
   )
