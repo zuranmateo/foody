@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { writeClient } from "@/sanity/lib/write-client";
-import { CHECK_FOR_EXISTING_USER, CHECK_FOR_ID_QUERY } from "@/sanity/lib/queries";
+import { CHECK_FOR_EXISTING_USER, CHECK_FOR_ID_QUERY } from "@/sanity/lib/query";
 import fs from "fs";
 import path from "path";
 import { client } from "@/sanity/lib/client";
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
     } while (existingId);
 
  const newUser = await writeClient.create({
-  _type: "user",
+  _type: "users",
   id: generatedId, 
   name,
   email,

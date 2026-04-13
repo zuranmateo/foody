@@ -18,8 +18,16 @@ export const ingredients = defineType({
     }),
     defineField({
       name: 'unit',
-      title: 'Enota',
-      type: 'string'
+      title: 'enota',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'miligram', value: 'mg' },
+          { title: 'gram', value: 'g' },
+          { title: 'kilogram', value: 'kg' },
+          { title: 'liter', value: 'l' },
+        ]
+      }
     }),
     defineField({
       name: 'inStock',

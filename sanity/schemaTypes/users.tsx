@@ -6,6 +6,11 @@ export const users = defineType({
   type: 'document',
   fields: [
     defineField({
+      name: 'id',
+      title: 'github id',
+      type: 'string',
+    }),
+    defineField({
       name: 'name',
       title: 'Ime',
       type: 'string',
@@ -26,7 +31,6 @@ export const users = defineType({
       name: 'phone',
       title: 'Telefonska številka',
       type: 'string',
-      validation: Rule => Rule.required()
     }),
     defineField({
       name: 'address',
@@ -43,8 +47,13 @@ export const users = defineType({
       initialValue: 'user'
     }),
     defineField({
-      name: 'avatar',
+      name: 'image',
       title: 'Profilna slika',
+      type: 'image'
+    }),
+    defineField({
+      name: 'imageUrl',
+      title: 'Profilna slika github',
       type: 'image'
     })
   ],

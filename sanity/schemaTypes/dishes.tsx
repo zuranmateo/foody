@@ -40,6 +40,22 @@ export const dishes = defineType({
       of: [{ type: 'reference', to: [{ type: 'ingredients' }] }]
     }),
     defineField({
+      name: 'category',
+      title: 'Kategorija',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Pica', value: 'pica' },
+          { title: 'Burger', value: 'burger' },
+          { title: 'Testenine', value: 'testenine' },
+          { title: 'Žar', value: 'žar' },
+          { title: 'Ribe', value: 'ribe' },
+          { title: 'Morska', value: 'morska' },
+          { title: 'Pijača', value: 'drink' }
+        ]
+      }
+    }),
+    defineField({
       name: 'preparationTime',
       title: 'Čas priprave (min)',
       type: 'number'
