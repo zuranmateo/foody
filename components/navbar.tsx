@@ -28,6 +28,13 @@ export default async function Navbar() {
                 <Link href="/menu">
                   <span className="block bg-primary text-white py-2 px-4 lg:text-xl md:text-sm text-sm rounded-xl">MENI</span>
                 </Link>
+                {session.user.role === "admin" ? (
+                  <Link href="/control">
+                    <span className="block rounded-xl border px-4 py-2 text-sm lg:text-base">
+                      Admin
+                    </span>
+                  </Link>
+                ) : null}
                 <Link href="/cart">
                   <KartNumber/>
                 </Link>

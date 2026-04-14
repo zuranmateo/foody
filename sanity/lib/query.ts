@@ -8,6 +8,7 @@ export const USER_BY_GITHUB_ID_QUERY = defineQuery(`
     email,
     password,
     imageUrl,
+    role,
    } 
 `);
 
@@ -23,6 +24,7 @@ export const USER_BY_ID_QUERY = defineQuery(`
   surname,
   email,
   password,
+  role,
   "image": image.asset->url,
   imageUrl,
   _rev,
@@ -40,6 +42,7 @@ export const USER_BY_EMAIL_QUERY = defineQuery(`
   surname,
   email,
   password,
+  role,
   "image": image.asset->url,
   imageUrl,
   _rev,
@@ -168,5 +171,52 @@ export const USER_ORDERS_QUERY = defineQuery(`
             price
          }
       }
+   }
+`)
+
+export const ADMIN_ORDERS_QUERY = defineQuery(`
+   *[_type == "orders"] | order(status asc, _createdAt desc){
+      _id,
+      _createdAt,
+      totalPrice,
+      status,
+      user->{
+         _id,
+         name,
+         surname,
+         email
+      },
+      items[]{
+         quantity,
+         dish->{
+            _id,
+            name,
+            "slug": slug.current,
+            price
+         }
+      }
+   }
+`)
+
+export const ADMIN_DASHBOARD_STATS_QUERY = defineQuery(`
+   {
+      "totalOrders": count(*[_type == "orders"]),
+      "pendingOrders": count(*[_type == "orders" && status == "pending"]),
+      "preparingOrders": count(*[_type == "orders" && status == "preparing"]),
+      "deliveredOrders": count(*[_type == "orders" && status == "delivered"]),
+      "totalUsers": count(*[_type == "users"]),
+      "totalIngredients": count(*[_type == "ingredients"]),
+      "outOfStockIngredients": count(*[_type == "ingredients" && inStock != true]),
+      "revenue": math::sum(*[_type == "orders"].totalPrice)
+   }
+`)
+
+export const ALL_INGREDIENTS_QUERY = defineQuery(`
+   *[_type == "ingredients"] | order(name asc){
+      _id,
+      name,
+      quantity,
+      unit,
+      inStock
    }
 `)

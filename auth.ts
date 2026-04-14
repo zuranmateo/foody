@@ -1,14 +1,10 @@
 import { default as NextAuth } from 'next-auth';
 import GitHubProvider from "next-auth/providers/github"
 import { client } from "./sanity/lib/client";
-import { USER_BY_EMAIL_QUERY, USER_BY_GITHUB_ID_QUERY } from "./sanity/lib/query";
+import { USER_BY_EMAIL_QUERY, USER_BY_GITHUB_ID_QUERY, USER_BY_ID_QUERY } from "./sanity/lib/query";
 import { writeClient } from "./sanity/lib/write-client";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
-import { stringify } from 'querystring';
-
-
-let id: number | null;
  
 export const { handlers, signIn, signOut, auth } = NextAuth({
 
@@ -38,13 +34,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   const isCorrect = await bcrypt.compare(password, user.password);
   if (!isCorrect) return null;
 
-  id = user.id;
   return {
     id: user._id,
+    _id: user._id,
     name: user.name,
     email: user.email,
     emailVerified: null,
     image: user.image,
+    imageUrl: user.imageUrl,
+    role: user.role,
   };
 }
 
@@ -72,7 +70,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return true;
     },
 
-    async jwt({token, account, profile}){
+    async jwt({token, account, profile, user}){
       if(account && profile){
         const user = await client.fetch(USER_BY_GITHUB_ID_QUERY, {
           id: profile?.id,
@@ -82,21 +80,30 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.id = user?.id;
         token._id = user?._id
         token.imageUrl = user?.imageUrl;
+        token.role = user?.role;
       }
-      else if(id){
-        const user = await client.fetch(USER_BY_GITHUB_ID_QUERY, {
-          id: id,
-        });
+      else if(user){
         token.provider = "credentials";
-        token.id = user?.id;
-        token._id = user?._id
-        //console.log(user?._id);
+        token.id = user.id;
+        token._id = user._id;
+        token.imageUrl = user.imageUrl;
+        token.role = user.role;
+      }
+      else if (token._id && !token.role) {
+        const existingUser = await client.fetch(USER_BY_ID_QUERY, {
+          id: token._id,
+        });
+
+        token.id = existingUser?.id ?? token.id;
+        token._id = existingUser?._id ?? token._id;
+        token.imageUrl = existingUser?.imageUrl ?? token.imageUrl;
+        token.role = existingUser?.role;
       }
       return token;
     },
 
     async session({ session, token }){
-      Object.assign(session.user, {id: token.id, imageUrl: token.imageUrl, _id: token._id, provider: token.provider});
+      Object.assign(session.user, {id: token.id, imageUrl: token.imageUrl, _id: token._id, provider: token.provider, role: token.role});
       //console.log(session)
       return session;
     },

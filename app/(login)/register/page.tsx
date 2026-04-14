@@ -8,7 +8,10 @@ import { toast } from "sonner";
 export default function RegisterPage() {
   const router = useRouter();
   const [name, setName] = useState("");
+  const [surname, setSurname] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState(""); // dodano stanje
   const [loading, setLoading] = useState(false);
