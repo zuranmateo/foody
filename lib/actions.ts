@@ -41,7 +41,29 @@ function writeCartToLocalStorage(cart: string[]) {
     window.dispatchEvent(new Event("cart-updated"));
 }
 
-export function AddToCart(newItem: string) {
+import { client } from '@/sanity/lib/client';
+
+export async function AddToCart(newItem: string) {
+    // Fetch dish to check stock
+    const dish = await client.fetch(`*[_type == "dishes" && slug.current == $slug][0]{
+      ingredients[]{
+        quantity,
+        ingredient->{
+          name,
+          quantity,
+          inStock
+        }
+      }
+    }`, { slug: newItem });
+
+    const isOutOfStock = dish?.ingredients?.some(
+      (ing: any) => !ing.ingredient?.inStock || ing.ingredient.quantity < ing.quantity
+    ) ?? true;
+
+    if (isOutOfStock) {
+      throw new Error("Dish is out of stock and cannot be added to cart");
+    }
+
     const cart = readCartFromLocalStorage();
     cart.push(newItem);
     writeCartToLocalStorage(cart);

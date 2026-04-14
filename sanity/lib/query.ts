@@ -66,7 +66,7 @@ export const POPULAR_DISHES_QUERY = defineQuery(`
       "slug": slug.current,
       description,
       price,
-      image,
+      "image": image.asset->url,
       ingredients[]{
          quantity,
          ingredient->{
@@ -90,7 +90,7 @@ export const CATEGORY_DISHES_QUERY = defineQuery(`
       "slug": slug.current,
       description,
       price,
-      image,
+      "image": image.asset->url,
       ingredients[]{
          quantity,
          ingredient->{
@@ -114,7 +114,7 @@ export const CART_DISHES_QUERY = defineQuery(`
       "slug": slug.current,
       description,
       price,
-      image,
+      "image": image.asset->url,
       ingredients[]{
          quantity,
          ingredient->{
@@ -140,6 +140,36 @@ export const ORDER_DISHES_QUERY = defineQuery(`
    }
 `)
 
+export const CHECKOUT_DISHES_QUERY = defineQuery(`
+   *[_type == "dishes" && slug.current in $slugs]{
+      _id,
+      name,
+      "slug": slug.current,
+      price,
+      isAvailable,
+      ingredients[] {
+         quantity,
+         ingredient->{
+            _id,
+            _rev,
+            name,
+            quantity,
+            unit,
+            inStock
+         }
+      }
+   }
+`)
+
+export const ORDER_BY_PAYPAL_ORDER_ID_QUERY = defineQuery(`
+   *[_type == "orders" && paypalOrderId == $paypalOrderId][0]{
+      _id,
+      user->{
+         _id
+      }
+   }
+`)
+
 export const PROFILE_USER_QUERY = defineQuery(`
    *[_type == "users" && _id == $id][0]{
       _id,
@@ -162,6 +192,9 @@ export const USER_ORDERS_QUERY = defineQuery(`
       _createdAt,
       totalPrice,
       status,
+      paymentStatus,
+      paidAt,
+      paypalOrderId,
       items[]{
          quantity,
          dish->{
@@ -180,6 +213,9 @@ export const ADMIN_ORDERS_QUERY = defineQuery(`
       _createdAt,
       totalPrice,
       status,
+      paymentStatus,
+      paidAt,
+      paypalOrderId,
       user->{
          _id,
          name,

@@ -48,6 +48,34 @@ export const orders = defineType({
         list: ['pending', 'preparing', 'delivered']
       }
     }),
+    defineField({
+      name: 'paymentProvider',
+      title: 'Payment provider',
+      type: 'string',
+    }),
+    defineField({
+      name: 'paymentStatus',
+      title: 'Payment status',
+      type: 'string',
+      options: {
+        list: ['completed', 'refunded', 'failed']
+      }
+    }),
+    defineField({
+      name: 'paypalOrderId',
+      title: 'PayPal order id',
+      type: 'string',
+    }),
+    defineField({
+      name: 'paypalCaptureId',
+      title: 'PayPal capture id',
+      type: 'string',
+    }),
+    defineField({
+      name: 'paidAt',
+      title: 'Paid at',
+      type: 'datetime',
+    }),
   ],
   preview: {
     select: {
