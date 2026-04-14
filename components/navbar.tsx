@@ -31,7 +31,7 @@ export default async function Navbar() {
                 <Link href="/cart">
                   <KartNumber/>
                 </Link>
-                <Link href={`/user/${session?.user?._id}`} className="flex justify-between items-center mr-5">
+                <Link href={`/user/${session?.user._id}`} className="flex justify-between items-center mr-5">
                   <span className="text-base md:text-base lg:text-xl">
                     {session?.user?.name}
                   </span>

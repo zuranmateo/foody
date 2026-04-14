@@ -59,7 +59,7 @@ export const users = defineType({
     defineField({
       name: 'imageUrl',
       title: 'Profilna slika github',
-      type: 'image'
+      type: 'string'
     })
   ],
   preview: {

@@ -44,6 +44,7 @@ type UserOrder = {
 export default async function UserPage({ params }: UserPageProps) {
   const { id } = await params;
   const session = await auth();
+  //console.log(session)
 
   if (!session?.user?._id) {
     redirect("/login");
@@ -52,7 +53,6 @@ export default async function UserPage({ params }: UserPageProps) {
   if (session.user._id !== id) {
     redirect("/");
   }
-
   const [user, orders] = await Promise.all([
     writeClient.fetch<UserProfile>(PROFILE_USER_QUERY, { id }),
     writeClient.fetch<UserOrder[]>(USER_ORDERS_QUERY, { id }),
@@ -62,7 +62,7 @@ export default async function UserPage({ params }: UserPageProps) {
     redirect("/");
   }
 
-  const profileImage = user.image || user.imageUrl || "/defaultProfileImg.png";
+  const profileImage = user?.image || user?.imageUrl || "/defaultProfileImg.png";
 
   return (
     <main className="main">
@@ -76,18 +76,20 @@ export default async function UserPage({ params }: UserPageProps) {
             className="h-24 w-24 rounded-full object-cover"
           />
           <div>
-            <h1>{[user.name, user.surname].filter(Boolean).join(" ") || user.name || "User"}</h1>
-            <p>{user.email}</p>
-            {user.phone ? <p>{user.phone}</p> : null}
-            {user.address ? <p>{user.address}</p> : null}
-            {user.role ? <p>Role: {user.role}</p> : null}
+            <h1>{[user?.name, user?.surname].filter(Boolean).join(" ") || user?.name || "User"}</h1>
+            <p>{user?.email}</p>
+            {user?.phone ? <p>{user?.phone}</p> : null}
+            {user?.address ? <p>{user?.address}</p> : null}
+            {user?.role ? <p>Role: {user?.role}</p> : null}
           </div>
         </div>
 
         <div className="flex flex-col gap-3">
-          <Link href={`/user/${id}/edit`} className="rounded-xl border px-4 py-2">
-            Edit profile
-          </Link>
+          {session.user._id !== id && (
+            <Link href={`/user/${id}/edit`} className="rounded-xl border px-4 py-2">
+              Edit profile
+            </Link>
+          )}
           <form action={async () => {
             "use server"
             await signOut({ redirectTo: "/" });

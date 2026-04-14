@@ -5,6 +5,7 @@ import { USER_BY_EMAIL_QUERY, USER_BY_GITHUB_ID_QUERY } from "./sanity/lib/query
 import { writeClient } from "./sanity/lib/write-client";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import { stringify } from 'querystring';
 
 
 let id: number | null;
@@ -61,7 +62,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if(!existingUser){
         await writeClient.create({
           _type: 'users',
-          id: profile?.id,
+          id: profile?.id as string,
           name: user?.name,
           email: user?.email,
           imageUrl: user?.image,
