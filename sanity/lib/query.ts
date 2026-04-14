@@ -66,7 +66,7 @@ export const POPULAR_DISHES_QUERY = defineQuery(`
       "slug": slug.current,
       description,
       price,
-      image,
+      "image": image.asset->url,
       ingredients[]{
          quantity,
          ingredient->{
@@ -90,7 +90,7 @@ export const CATEGORY_DISHES_QUERY = defineQuery(`
       "slug": slug.current,
       description,
       price,
-      image,
+      "image": image.asset->url,
       ingredients[]{
          quantity,
          ingredient->{
@@ -114,7 +114,7 @@ export const CART_DISHES_QUERY = defineQuery(`
       "slug": slug.current,
       description,
       price,
-      image,
+      "image": image.asset->url,
       ingredients[]{
          quantity,
          ingredient->{
