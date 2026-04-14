@@ -40,7 +40,6 @@ export default function DishCard({dish, isLoggedIn}: DishCardProps){
   ) ?? false;
 
   const handleAddToCart = async () => {
-    if (isOutOfStock) return;
     setLoading(true);
 
     try {
@@ -62,8 +61,7 @@ export default function DishCard({dish, isLoggedIn}: DishCardProps){
             <Image 
               src={dish.image} 
               alt={dish.name} 
-              width={100}
-              height={100} 
+              fill
               className="object-cover group-hover:scale-110 transition-transform" 
             />
           )}
