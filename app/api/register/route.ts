@@ -8,7 +8,7 @@ import { client } from "@/sanity/lib/client";
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, email, password } = await req.json();
+    const { name, surname, email, phone, address, password } = await req.json();
 
     if (!name || !email || !password) {
       return NextResponse.json(
@@ -52,8 +52,12 @@ export async function POST(req: NextRequest) {
  const newUser = await writeClient.create({
   _type: "users",
   name,
+  surname,
   email,
+  phone,
+  address,
   password: hashedPassword,
+  role: "user",
   image: {
     _type: 'image',
     asset: {

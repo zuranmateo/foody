@@ -32,7 +32,7 @@ export default function RegisterPage() {
     const res = await fetch("/api/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({ name, surname, email, phone, address, password }),
     });
 
     const data = await res.json();
@@ -61,6 +61,14 @@ export default function RegisterPage() {
         className="login-text-area"
         required
       />
+      <input
+        type="text"
+        placeholder="surname"
+        value={surname}
+        onChange={(e) => setSurname(e.target.value)}
+        className="login-text-area"
+        required
+      />
 
       <input
         type="email"
@@ -70,7 +78,22 @@ export default function RegisterPage() {
         className="login-text-area"
         required
       />
-
+      <input
+        type="text"
+        placeholder="phone number"
+        value={phone}
+        onChange={(e) => setPhone(e.target.value)}
+        className="login-text-area"
+        required
+      />
+      <input
+        type="text"
+        placeholder="address"
+        value={address}
+        onChange={(e) => setAddress(e.target.value)}
+        className="login-text-area"
+        required
+      />
       <input
         type="password"
         placeholder="Password"
