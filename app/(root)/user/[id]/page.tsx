@@ -85,11 +85,9 @@ export default async function UserPage({ params }: UserPageProps) {
         </div>
 
         <div className="flex flex-col gap-3">
-          {session.user._id !== id && (
             <Link href={`/user/${id}/edit`} className="rounded-xl border px-4 py-2">
               Edit profile
             </Link>
-          )}
           <form action={async () => {
             "use server"
             await signOut({ redirectTo: "/" });
