@@ -13,7 +13,7 @@ export default function AdminSidebar() {
     const pathname = usePathname();
 
     return (
-        <aside className="w-full rounded-3xl border bg-card p-4 shadow-sm lg:sticky lg:top-6 lg:w-64 lg:self-start">
+        <aside className="sticky top-24 w-60 self-start rounded-3xl border bg-card p-4 shadow-sm">
             <p className="text-sm font-medium uppercase tracking-[0.2em] text-muted-foreground">
                 Control panel
             </p>

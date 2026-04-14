@@ -1,3 +1,4 @@
+import RecentOrderCard from "@/components/cards/RecentOrderCard";
 import { ADMIN_DASHBOARD_STATS_QUERY, ADMIN_ORDERS_QUERY } from "@/sanity/lib/query";
 import { writeClient } from "@/sanity/lib/write-client";
 
@@ -92,22 +93,7 @@ export default async function DashboardPage() {
                 {recentOrders.length ? (
                     <div className="mt-4 space-y-3">
                         {recentOrders.map((order) => (
-                            <article key={order._id} className="rounded-2xl border bg-muted/30 p-4">
-                                <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-                                    <div>
-                                        <p className="font-medium">Order #{order._id.slice(-6)}</p>
-                                        <p className="text-sm text-muted-foreground">
-                                            {[order.user?.name, order.user?.surname].filter(Boolean).join(" ") || order.user?.email || "Unknown user"}
-                                        </p>
-                                    </div>
-                                    <div className="text-sm text-muted-foreground">
-                                        <p>{new Date(order._createdAt).toLocaleString()}</p>
-                                        <p className="font-medium capitalize text-foreground">
-                                            {order.status ?? "pending"} • {order.totalPrice ?? 0} EUR
-                                        </p>
-                                    </div>
-                                </div>
-                            </article>
+                            <RecentOrderCard key={order._id} order={order}/>
                         ))}
                     </div>
                 ) : (

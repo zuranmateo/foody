@@ -22,9 +22,11 @@ export const ingredients = defineType({
       type: 'string',
       options: {
         list: [
+          { title: 'kosov', value: 'kosov' },
           { title: 'miligram', value: 'mg' },
           { title: 'gram', value: 'g' },
           { title: 'kilogram', value: 'kg' },
+          { title: 'mililiter', value: 'ml' },
           { title: 'liter', value: 'l' },
         ]
       }

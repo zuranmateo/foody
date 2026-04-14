@@ -91,7 +91,7 @@ export default async function OrdersPage({ searchParams }: OrdersPageProps) {
                                     </p>
                                     <p>User ID: {order.user?._id ?? "n/a"}</p>
                                 </div>
-                                <OrderCard order={order} />
+                                <OrderCard order={order} showStatusEditor />
                             </div>
                         ))}
                     </div>

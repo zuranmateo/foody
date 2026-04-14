@@ -10,7 +10,7 @@ type Ingredient = {
     inStock?: boolean;
 };
 
-const units = ["mg", "g", "kg", "l"];
+const units = ["kosov", "mg", "g", "kg", "ml" ,"l"];
 
 export default async function IngredientsPage() {
     const ingredients = await writeClient.fetch<Ingredient[]>(ALL_INGREDIENTS_QUERY);
