@@ -74,18 +74,28 @@ export default async function EditUserPage({ params }: EditUserPageProps) {
 
           <label htmlFor="surname">Surname</label>
           <input id="surname" name="surname" type="text" defaultValue={user.surname || ""} className="rounded-xl border px-3 py-2" />
-
-          <label htmlFor="email">Email</label>
-          <input id="email" name="email" type="email" defaultValue={user.email || ""} required className="rounded-xl border px-3 py-2" />
-
+          {session?.user?.provider == "credentials" ? (
+            <>
+              <label htmlFor="email">Email</label>
+              <input id="email" name="email" type="email" defaultValue={user.email || ""} required className="rounded-xl border px-3 py-2" />
+            </>
+          ):(
+            <input type="hidden" name="email" id="email" value={user.email || ""}/>
+          )}
           <label htmlFor="phone">Phone</label>
           <input id="phone" name="phone" type="text" defaultValue={user.phone || ""} className="rounded-xl border px-3 py-2" />
 
           <label htmlFor="address">Address</label>
           <input id="address" name="address" type="text" defaultValue={user.address || ""} className="rounded-xl border px-3 py-2" />
 
-          <label htmlFor="image">Choose new profile image</label>
-          <input id="image" name="image" type="file" accept="image/*" className="rounded-xl border px-3 py-2" />
+          {session?.user?.provider == "credentials" ? (
+            <>
+              <label htmlFor="image">Choose new profile image</label>
+              <input id="image" name="image" type="file" accept="image/*" className="rounded-xl border px-3 py-2" />
+            </>
+          ):(
+            ""
+          )}
 
           <button type="submit" className="w-fit rounded-xl border px-4 py-2">
             Save profile

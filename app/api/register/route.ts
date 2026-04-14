@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
       buffer,
       {filename: "defaultProfileImg.png"}
     )
-    
+    /*
     let generatedId;
     let existingId;
     do {
@@ -48,10 +48,9 @@ export async function POST(req: NextRequest) {
       existingId = await client.fetch(CHECK_FOR_ID_QUERY, {generatedId})
       //console.log(existingId)
     } while (existingId);
-
+*/
  const newUser = await writeClient.create({
   _type: "users",
-  id: generatedId, 
   name,
   email,
   password: hashedPassword,

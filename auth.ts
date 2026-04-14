@@ -5,6 +5,14 @@ import { USER_BY_EMAIL_QUERY, USER_BY_GITHUB_ID_QUERY, USER_BY_ID_QUERY } from "
 import { writeClient } from "./sanity/lib/write-client";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+
+function getGitHubProfileId(profile: { id?: string | number | null } | null | undefined) {
+  if (profile?.id === undefined || profile.id === null) {
+    return null;
+  }
+
+  return String(profile.id);
+}
  
 export const { handlers, signIn, signOut, auth } = NextAuth({
 
@@ -54,13 +62,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   callbacks: {
     async signIn({ user, profile, account }) {
       if(account?.provider == "github"){
+        const githubProfileId = getGitHubProfileId(profile);
+
+        if (!githubProfileId) {
+          return false;
+        }
+
         const existingUser = await client.fetch(USER_BY_GITHUB_ID_QUERY, { 
-          id: profile?.id,
+          id: githubProfileId,
        });
       if(!existingUser){
         await writeClient.create({
           _type: 'users',
-          id: profile?.id as string,
+          id: githubProfileId,
           name: user?.name,
           email: user?.email,
           imageUrl: user?.image,
@@ -72,8 +86,14 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
     async jwt({token, account, profile, user}){
       if(account && profile){
+        const githubProfileId = getGitHubProfileId(profile);
+
+        if (!githubProfileId) {
+          return token;
+        }
+
         const user = await client.fetch(USER_BY_GITHUB_ID_QUERY, {
-          id: profile?.id,
+          id: githubProfileId,
         });
 
         token.provider = "github";
