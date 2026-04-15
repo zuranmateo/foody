@@ -65,15 +65,15 @@ export default async function UserPage({ params }: UserPageProps) {
   const profileImage = user?.image || user?.imageUrl || "/defaultProfileImg.png";
 
   return (
-    <main className="main">
-      <div className="flex items-start justify-between gap-6 rounded-2xl border p-6">
-        <div className="flex items-center gap-4">
+    <main className="">
+      <div className="">
+        <div className="">
           <Image
             src={profileImage}
             alt="Profile image"
             width={96}
             height={96}
-            className="h-24 w-24 rounded-full object-cover"
+            className=""
           />
           <div>
             <h1>{[user?.name, user?.surname].filter(Boolean).join(" ") || user?.name || "User"}</h1>
@@ -84,32 +84,32 @@ export default async function UserPage({ params }: UserPageProps) {
           </div>
         </div>
 
-        <div className="flex flex-col gap-3">
-            <Link href={`/user/${id}/edit`} className="rounded-xl border px-4 py-2">
+        <div className="">
+            <Link href={`/user/${id}/edit`} className="">
               Edit profile
             </Link>
           <form action={async () => {
             "use server"
             await signOut({ redirectTo: "/" });
           }}>
-            <button type="submit" className="rounded-xl border px-4 py-2">
+            <button type="submit" className="">
               Sign out
             </button>
           </form>
         </div>
       </div>
 
-      <section className="mt-8">
+      <section className="">
         <h2>Your orders</h2>
 
         {orders?.length ? (
-          <div className="mt-4 flex flex-col gap-4">
+          <div className="">
             {orders.map((order) => (
               <OrderCard key={order._id} order={order} />
             ))}
           </div>
         ) : (
-          <p className="mt-4">You do not have any orders yet.</p>
+          <p className="">You do not have any orders yet.</p>
         )}
       </section>
     </main>

@@ -10,8 +10,8 @@ async function PopularDishes({ isLoggedIn }: { isLoggedIn: boolean }) {
   const popDishes = await writeClient.fetch(POPULAR_DISHES_QUERY)
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-4">Popularne jedi</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <h1 className="">Popularne jedi</h1>
+      <div className="">
         {popDishes?.length > 0 ? (
           popDishes.map((popDish: any) => (
             <DishCard key={popDish._id} dish={popDish} isLoggedIn={isLoggedIn}/>
@@ -32,9 +32,9 @@ async function CategoryDishes({
   isLoggedIn: boolean 
 }) {
   return (
-    <div className="mb-12">
-      <h1 className="text-2xl font-bold mb-6">{categorySection.title}</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="">
+      <h1 className="">{categorySection.title}</h1>
+      <div className="">
         {categorySection.dishes?.length > 0 ? (
           categorySection.dishes.map((dish: any) => (
             <DishCard key={dish._id} dish={dish} isLoggedIn={isLoggedIn}/>
@@ -69,21 +69,21 @@ export default async function page(){
   )
 
   return (
-    <div className="max-w-7xl mx-auto p-6 space-y-12">
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+    <div className="">
+      <div className="">
+        <h1 className="">
           MENU
         </h1>
-        <div className="h-64 md:h-80 bg-gradient-to-r from-muted to-muted-foreground/30 rounded-3xl overflow-hidden mx-auto max-w-4xl shadow-2xl">
+        <div className="">
           {/* Hero image placeholder - add your food image here */}
-          <div className="h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-            <span className="text-2xl text-muted-foreground/50">Delicious food awaits...</span>
+          <div className="">
+            <span className="">Delicious food awaits...</span>
           </div>
         </div>
       </div>
 
       <Suspense fallback={
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="">
           <DishSkeleton />
           <DishSkeleton />
           <DishSkeleton />
@@ -96,7 +96,7 @@ export default async function page(){
         <Suspense 
           key={categorySection.value}
           fallback={
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="">
               <DishSkeleton />
               <DishSkeleton />
               <DishSkeleton />

@@ -44,22 +44,22 @@ export default async function EditUserPage({ params }: EditUserPageProps) {
   const profileImage = user.image || user.imageUrl || "/defaultProfileImg.png";
 
   return (
-    <main className="main">
-      <div className="mb-6 flex items-center justify-between gap-4">
+    <main className="">
+      <div className="">
         <h1>Edit profile</h1>
-        <Link href={`/user/${id}`} className="rounded-xl border px-4 py-2">
+        <Link href={`/user/${id}`} className="">
           Back to profile
         </Link>
       </div>
 
-      <div className="rounded-2xl border p-6">
-        <div className="mb-6 flex items-center gap-4">
+      <div className="">
+        <div className="">
           <Image
             src={profileImage}
             alt="Current profile image"
             width={96}
             height={96}
-            className="h-24 w-24 rounded-full object-cover"
+            className=""
           />
           <div>
             <h2>{user.name || "User"}</h2>
@@ -67,7 +67,7 @@ export default async function EditUserPage({ params }: EditUserPageProps) {
           </div>
         </div>
 
-        <form action={UpdateUserProfile} className="flex flex-col gap-4">
+        <form action={UpdateUserProfile} className="">
           <input type="hidden" name="userId" value={id} />
           <label htmlFor="name">Name</label>
           <input id="name" name="name" type="text" defaultValue={user.name || ""} required className="rounded-xl border px-3 py-2" />

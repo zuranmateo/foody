@@ -32,15 +32,15 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="main">
-      <div className="text-white bg-primary p-8 rounded-lg shadow w-full max-w-md">
+    <div className="">
+      <div className="">
 
-        <h2 className="text-2xl font-semibold text-center mb-6">Log In</h2>
+        <h2 className="">Log In</h2>
 
         <form onSubmit={handleLogin} className="space-y-6">
           <input
             type="email"
-            className="login-text-area"
+            className=""
             placeholder="Email"
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -48,7 +48,7 @@ export default function LoginPage() {
 
           <input
             type="password"
-            className="login-text-area"
+            className=""
             placeholder="Password"
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -57,7 +57,7 @@ export default function LoginPage() {
           <button
             type="submit"
             name="login"
-            className="cursor-pointer w-full p-2 bg-secondary text-textprimary rounded hover:bg-secondaryDarkened"
+            className="cursor-pointer"
             disabled={loading}
           >
             {loading ? "Logging in..." : "Log In"}
@@ -67,12 +67,12 @@ export default function LoginPage() {
         {/* Prijva z GitHub računom*/}
         <button
           onClick={() => signIn("github")}
-          className="cursor-pointer w-full mt-4 p-2 bg-black text-white rounded hover:bg-white hover:text-black"
+          className=""
         >
           Login with GitHub
         </button>
 
-        <p className="text-center text-sm mt-3">
+        <p className="">
           Don’t have an account?{" "}
         <Link href="./register" className="linkV1">
           Register
