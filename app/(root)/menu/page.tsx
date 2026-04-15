@@ -4,6 +4,7 @@ import DishCard from '@/components/cards/DishCard'
 import { DishSkeleton } from '@/components/ui/DishSkeleton'
 import { CATEGORY_DISHES_QUERY, POPULAR_DISHES_QUERY } from '@/sanity/lib/query'
 import { writeClient } from '@/sanity/lib/write-client'
+import { SanityLive } from '@/sanity/lib/live'
 
 async function PopularDishes({ isLoggedIn }: { isLoggedIn: boolean }) {
   const popDishes = await writeClient.fetch(POPULAR_DISHES_QUERY)
@@ -105,6 +106,7 @@ export default async function page(){
           <CategoryDishes categorySection={categorySection} isLoggedIn={isLoggedIn} />
         </Suspense>
       ))}
+      <SanityLive />
     </div>
   )
 }
