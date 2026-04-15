@@ -7,6 +7,8 @@ const links = [
     { href: "/control/dashboard", label: "Dashboard" },
     { href: "/control/orders", label: "Orders" },
     { href: "/control/ingredients", label: "Ingredients" },
+    { href: "/control/dishes", label: "Dishes" },
+    { href: "/control/contact", label: "Contact users" },
 ];
 
 export default function AdminSidebar() {
