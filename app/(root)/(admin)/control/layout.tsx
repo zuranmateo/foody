@@ -1,5 +1,6 @@
 import AdminSidebar from "@/components/admin/AdminSidebar";
 import { requireAdmin } from "@/lib/admin-actions";
+import { SanityLive } from "@/sanity/lib/live";
 
 export default async function ControlLayout({
     children,
@@ -10,9 +11,9 @@ export default async function ControlLayout({
 
     return (
         <main className="mx-auto min-h-[calc(100vh-5rem)] w-full max-w-7xl px-4 py-6 lg:px-6">
-            <div className="grid grid-cols-[240px_minmax(0,1fr)] items-start gap-6">
+            <div className="flex justify-between">
                 <AdminSidebar />
-                <section className="min-w-0 rounded-3xl border bg-card p-5 shadow-sm lg:p-8">
+                <section className="w-full rounded-3xl border bg-card p-5 shadow-sm lg:p-8">
                     <div className="mb-6 flex items-center justify-between gap-4 border-b pb-4">
                         <div>
                             <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">
@@ -27,6 +28,7 @@ export default async function ControlLayout({
                     {children}
                 </section>
             </div>
+            <SanityLive />
         </main>
     );
 }

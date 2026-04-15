@@ -60,7 +60,7 @@ export const CHECK_FOR_ID_QUERY = defineQuery(`
 `)
 
 export const POPULAR_DISHES_QUERY = defineQuery(`
-   *[_type == "dishes" && isPopular == true]{
+   *[_type == "dishes" && isPopular == true && coalesce(isAvailable, true) == true]{
       _id,
       name,
       "slug": slug.current,
@@ -84,7 +84,7 @@ export const POPULAR_DISHES_QUERY = defineQuery(`
 `)
 
 export const CATEGORY_DISHES_QUERY = defineQuery(`
-   *[_type == "dishes" && category == $category]{
+   *[_type == "dishes" && category == $category && coalesce(isAvailable, true) == true]{
       _id,
       name,
       "slug": slug.current,
@@ -254,5 +254,130 @@ export const ALL_INGREDIENTS_QUERY = defineQuery(`
       quantity,
       unit,
       inStock
+   }
+`)
+
+export const INGREDIENTS_COUNT_QUERY = defineQuery(`
+   count(*[_type == "ingredients"])
+`)
+
+export const PAGINATED_INGREDIENTS_QUERY = defineQuery(`
+   *[_type == "ingredients"] | order(name asc)[$start...$end]{
+      _id,
+      name,
+      quantity,
+      unit,
+      inStock
+   }
+`)
+
+export const DISH_SLUG_EXISTS_QUERY = defineQuery(`
+   count(*[_type == "dishes" && slug.current == $slug]) > 0
+`)
+
+export const DISH_REFERENCED_IN_ORDERS_QUERY = defineQuery(`
+   count(*[_type == "orders" && references($dishId)])
+`)
+
+export const DISHES_COUNT_QUERY = defineQuery(`
+   count(*[_type == "dishes"])
+`)
+
+export const PAGINATED_DISHES_QUERY = defineQuery(`
+   *[_type == "dishes"] | order(name asc)[$start...$end]{
+      _id,
+      name,
+      "slug": slug.current,
+      description,
+      price,
+      category,
+      preparationTime,
+      isPopular,
+      isAvailable,
+      ingredients[]{
+         quantity,
+         ingredient->{
+            _id,
+            name,
+            unit
+         }
+      }
+   }
+`)
+
+export const ADMIN_DISH_FORM_INGREDIENTS_QUERY = defineQuery(`
+   *[_type == "ingredients"] | order(name asc){
+      _id,
+      name,
+      unit
+   }
+`)
+
+export const ADMIN_ORDERS_COUNT_QUERY = defineQuery(`
+   count(*[
+      _type == "orders" &&
+      ($status == "all" || coalesce(status, "pending") == $status)
+   ])
+`)
+
+export const PAGINATED_ADMIN_ORDERS_QUERY = defineQuery(`
+   *[
+      _type == "orders" &&
+      ($status == "all" || coalesce(status, "pending") == $status)
+   ] | order(status asc, _createdAt desc)[$start...$end]{
+      _id,
+      _createdAt,
+      totalPrice,
+      status,
+      paymentStatus,
+      paidAt,
+      paypalOrderId,
+      user->{
+         _id,
+         name,
+         surname,
+         email
+      },
+      items[]{
+         quantity,
+         dish->{
+            _id,
+            name,
+            "slug": slug.current,
+            price
+         }
+      }
+   }
+`)
+
+export const ADMIN_CONTACT_USERS_QUERY = defineQuery(`
+   *[_type == "users"] | order(name asc, surname asc, email asc){
+      _id,
+      name,
+      surname,
+      email,
+      role
+   }
+`)
+
+export const ADMIN_SENT_EMAILS_QUERY = defineQuery(`
+   *[_type == "sentEmails"] | order(sentAt desc)[0...10]{
+      _id,
+      to,
+      subject,
+      status,
+      sentAt,
+      admin->{
+         _id,
+         name,
+         surname,
+         email
+      },
+      user->{
+         _id,
+         name,
+         surname,
+         email
+      }
    }
 `)
