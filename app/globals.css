@@ -127,6 +127,9 @@
   .h1{
     @apply relative mb-6 text-4xl max-w-200 font-extrabold uppercase tracking-tight text-white sm:text-5xl md:text-6xl;
   }
+  .navbar{
+    @apply font-mono uppercase;
+  }
 }
 
 @layer base {

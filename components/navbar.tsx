@@ -28,16 +28,16 @@ export default async function Navbar() {
             (
               <>
                 <Link href="/menu">
-                  <span className="">Menu</span>
+                  <span className="navbar">Menu</span>
                 </Link>
 
                 <Link href="/">
-                  <span className="">Home</span>
+                  <span className="navbar">Home</span>
                 </Link>
 
                 {session.user.role === "admin" ? (
                   <Link href="/control">
-                    <span className="">
+                    <span className="navbar">
                       Admin
                     </span>
                   </Link>
@@ -55,7 +55,7 @@ export default async function Navbar() {
                 </Link>
             </>
           ):(
-            <button className="mx-5 gap-5">
+            <button className="navbar mx-5 gap-5">
                 <Link href="/login">
                     Login
                 </Link>
