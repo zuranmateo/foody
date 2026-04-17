@@ -1,5 +1,6 @@
 "use client";
 
+import ReceiptDownloadButton from "@/components/receipt/ReceiptDownloadButton";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { ClearCartFromLocalStorage, GetCartItemsFromLocalStorage } from "@/lib/actions";
@@ -311,6 +312,11 @@ export default function PaypalCheckout() {
               <Link href="/menu" className="rounded-2xl bg-foreground px-4 py-2 text-background">
                 Back to menu
               </Link>
+              <ReceiptDownloadButton
+                orderId={successOrderId}
+                label="Save PDF receipt"
+                className="rounded-2xl"
+              />
               {redirectPath ? (
                 <Link href={redirectPath} className="rounded-2xl border px-4 py-2">
                   View my orders
