@@ -10,9 +10,8 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Funkcija za prijavo uporabnika
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault(); // Prepreči reload strani
+    e.preventDefault();
     setLoading(true);
 
     const Res = await signIn("credentials", {
@@ -23,24 +22,26 @@ export default function LoginPage() {
 
     setLoading(false);
 
-    // Če ni napake, je prijava uspešna
-    if (!Res?.error){
-      toast.success("Successfull login")
+    if (!Res?.error) {
+      toast.success("Successfull login");
       window.location.href = "./";
+    } else {
+      toast.error("Invalid email or password");
     }
-    else toast.error("Invalid email or password");
   };
 
   return (
-    <div className="">
-      <div className="">
+    <section className="bg-white h-[450px] flex items-center justify-center">
+      <div className="w-full max-w-sm rounded-2xl p-8 backdrop-blur-xl bg-white/20 shadow-2xl border border-white/30">
 
-        <h2 className="">Log In</h2>
+        <h2 className="text-2xl font-semibold text-center text-red-800 p-3">
+          Log In
+        </h2>
 
-        <form onSubmit={handleLogin} className="space-y-6">
+        <form onSubmit={handleLogin} className="space-y-4">
           <input
             type="email"
-            className=""
+            className="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-800"
             placeholder="Email"
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -48,7 +49,7 @@ export default function LoginPage() {
 
           <input
             type="password"
-            className=""
+            className="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-red-800"
             placeholder="Password"
             onChange={(e) => setPassword(e.target.value)}
             required
@@ -57,28 +58,27 @@ export default function LoginPage() {
           <button
             type="submit"
             name="login"
-            className="cursor-pointer"
+            className="w-full bg-red-800 text-white p-3 rounded-lg font-semibold hover:bg-red-900 transition disabled:opacity-50"
             disabled={loading}
           >
             {loading ? "Logging in..." : "Log In"}
           </button>
         </form>
 
-        {/* Prijva z GitHub računom*/}
         <button
           onClick={() => signIn("github")}
-          className=""
+          className="w-full mt-4 bg-black text-white p-3 rounded-lg hover:bg-gray-800 transition"
         >
           Login with GitHub
         </button>
 
-        <p className="">
+        <p className="text-center mt-5 text-gray-600">
           Don’t have an account?{" "}
-        <Link href="./register" className="linkV1">
-          Register
-        </Link>
+          <Link href="./register" className="text-red-800 underline hover:text-red-900">
+            Register
+          </Link>
         </p>
       </div>
-    </div>
+    </section>
   );
 }

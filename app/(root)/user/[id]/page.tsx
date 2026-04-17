@@ -44,7 +44,6 @@ type UserOrder = {
 export default async function UserPage({ params }: UserPageProps) {
   const { id } = await params;
   const session = await auth();
-  //console.log(session)
 
   if (!session?.user?._id) {
     redirect("/login");
@@ -53,6 +52,7 @@ export default async function UserPage({ params }: UserPageProps) {
   if (session.user._id !== id) {
     redirect("/");
   }
+
   const [user, orders] = await Promise.all([
     writeClient.fetch<UserProfile>(PROFILE_USER_QUERY, { id }),
     writeClient.fetch<UserOrder[]>(USER_ORDERS_QUERY, { id }),
@@ -62,21 +62,26 @@ export default async function UserPage({ params }: UserPageProps) {
     redirect("/");
   }
 
-  const profileImage = user?.image || user?.imageUrl || "/defaultProfileImg.png";
+  const profileImage =
+    user?.image || user?.imageUrl || "/defaultProfileImg.png";
 
   return (
-    <main className="">
+    <main className="md:w-225 w-100 my-5 mx-auto shadow-lg p-5">
       <div className="">
-        <div className="">
+        <div className="flex p-2">
           <Image
             src={profileImage}
             alt="Profile image"
             width={96}
             height={96}
-            className=""
+            className="w-25 h-25 rounded-full m-3 border-2 border-black object-cover"
           />
           <div>
-            <h1>{[user?.name, user?.surname].filter(Boolean).join(" ") || user?.name || "User"}</h1>
+            <h1 className="m-5 font-bold text-2xl">
+              {[user?.name, user?.surname].filter(Boolean).join(" ") ||
+                user?.name ||
+                "User"}
+            </h1>
             <p>{user?.email}</p>
             {user?.phone ? <p>{user?.phone}</p> : null}
             {user?.address ? <p>{user?.address}</p> : null}
@@ -84,23 +89,29 @@ export default async function UserPage({ params }: UserPageProps) {
           </div>
         </div>
 
-        <div className="">
-            <Link href={`/user/${id}/edit`} className="">
-              Edit profile
-            </Link>
-          <form action={async () => {
-            "use server"
-            await signOut({ redirectTo: "/" });
-          }}>
-            <button type="submit" className="">
+        <div className="flex gap-5 items-center justify-center border font-bold border-black p-3 bg-black text-white uppercase mt-5">
+          <Link
+            href={`/user/${id}/edit`}
+            className="rounded bg-black text-white p-2"
+          >
+            Edit profile
+          </Link>
+
+          <form
+            action={async () => {
+              "use server";
+              await signOut({ redirectTo: "/" });
+            }}
+          >
+            <button type="submit" className="rounded bg-black text-white p-2">
               Sign out
             </button>
           </form>
         </div>
       </div>
 
-      <section className="">
-        <h2>Your orders</h2>
+      <section className="mt-5">
+        <h2 className="font-bold text-xl mb-3">Your orders</h2>
 
         {orders?.length ? (
           <div className="">
@@ -109,7 +120,9 @@ export default async function UserPage({ params }: UserPageProps) {
             ))}
           </div>
         ) : (
-          <p className="">You do not have any orders yet.</p>
+          <p className="text-center p-5">
+            You do not have any orders yet.
+          </p>
         )}
       </section>
     </main>
