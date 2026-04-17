@@ -9,8 +9,13 @@ export default async function Navbar() {
   const session = await auth();
 
   return (
-      <nav className="flex items-center justify-between w-full">
- 
+      <nav className="shadow-2xl flex items-center justify-between w-full">
+      <style>{`
+          body {
+          font-family: Arial, sans-serif;
+          background: #f9f9f9;
+          }
+    `}</style>  
             <Link href="/">
                 <Image
                   src="/logo.png"
@@ -20,7 +25,6 @@ export default async function Navbar() {
                 />
             </Link>
   
-
             <div className="flex gap-5 mx-5 items-center ">
               
             {/* Če je uporabnik prijavljen */}

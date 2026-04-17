@@ -100,13 +100,19 @@ export default function CartPage() {
 
   return (
     <main className="">
-      <h1>Cart</h1>
+      <style>{`
+        body {
+          font-family: Arial, sans-serif;
+          background: #f9f9f9;
+        }
+      `}</style>  
+      <h1 className="h2 mx-auto text-center">Cart</h1>
       {message ? <p>{message}</p> : null}
 
       {loading ? (
         <p>Loading cart...</p>
       ) : cartItems.length === 0 ? (
-        <p>Your cart is empty.</p>
+        <p className="mx-auto text-center mt-50">Your cart is empty.</p>
       ) : (
         <div className="">
           {cartItems.map(({ cartIndex, dish }) => (
