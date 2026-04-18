@@ -1,4 +1,5 @@
 import { UpdateOrderStatus } from '@/lib/admin-actions'
+import ReceiptDownloadButton from '@/components/receipt/ReceiptDownloadButton'
 import React from 'react'
 
 export default function OrderCard({
@@ -59,6 +60,14 @@ export default function OrderCard({
                       </span>
                     </div>
                   ))}
+                </div>
+
+                <div className="mt-4">
+                  <ReceiptDownloadButton
+                    orderId={order._id}
+                    label="Download receipt PDF"
+                    size="sm"
+                  />
                 </div>
               </div>
   )
