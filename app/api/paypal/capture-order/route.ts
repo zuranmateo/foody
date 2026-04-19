@@ -4,6 +4,8 @@ import {
   findExistingOrderByPaypalOrderId,
 } from "@/lib/checkout";
 import { getPaypalAccessToken, paypalRequest } from "@/lib/paypal";
+import { sendPaidOrderConfirmationEmail } from "@/lib/email";
+import { after } from "next/server";
 
 type CapturePaypalOrderResponse = {
   id?: string;
@@ -71,6 +73,16 @@ export async function POST(request: Request) {
       paypalOrderId,
       paypalCaptureId: completedCapture.id,
     });
+
+    if (!result.alreadyRecorded) {
+      after(async () => {
+        try {
+          await sendPaidOrderConfirmationEmail(result.orderId);
+        } catch (error) {
+          console.error("Failed to send payment confirmation email:", error);
+        }
+      });
+    }
 
     return Response.json({
       orderId: result.orderId,

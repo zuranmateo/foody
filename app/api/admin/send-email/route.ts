@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { buildSimpleHtmlEmail, sendResendEmail } from "@/lib/email";
 import { isValidEmail } from "@/lib/validation";
 import { client } from "@/sanity/lib/client";
 import { USER_BY_ID_QUERY } from "@/sanity/lib/query";
@@ -6,32 +7,10 @@ import { writeClient } from "@/sanity/lib/write-client";
 import { NextResponse } from "next/server";
 
 type SendEmailPayload = {
-    subject?: string;
-    message?: string;
-    userId?: string;
+  subject?: string;
+  message?: string;
+  userId?: string;
 };
-
-function escapeHtml(value: string) {
-    return value
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-}
-
-function buildHtmlEmail(subject: string, message: string) {
-    const escapedSubject = escapeHtml(subject);
-    const escapedMessage = escapeHtml(message).replace(/\n/g, "<br />");
-
-    return `
-        <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111827; max-width: 640px; margin: 0 auto;">
-            <p style="margin-bottom: 16px; color: #6b7280;">Foody admin message</p>
-            <h1 style="font-size: 24px; margin-bottom: 16px;">${escapedSubject}</h1>
-            <div style="font-size: 16px;">${escapedMessage}</div>
-        </div>
-    `;
-}
 
 export async function POST(request: Request) {
     const session = await auth();
@@ -71,13 +50,6 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Message is too long." }, { status: 400 });
     }
 
-    if (!process.env.RESEND_API_KEY) {
-        return NextResponse.json(
-            { error: "RESEND_API_KEY is not configured." },
-            { status: 500 },
-        );
-    }
-
     const user = await client.fetch<{
         _id: string;
         email?: string;
@@ -95,29 +67,19 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Selected user does not have a valid email." }, { status: 400 });
     }
 
-    const resendResponse = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-            Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            from: process.env.RESEND_FROM_EMAIL || "Foody <onboarding@resend.dev>",
-            to: [to],
+    let resendResult: { id?: string };
+
+    try {
+        resendResult = await sendResendEmail({
+            to,
             subject,
-            html: buildHtmlEmail(subject, message),
-        }),
-    });
-
-    const resendResult = await resendResponse.json();
-
-    if (!resendResponse.ok) {
+            text: message,
+            html: buildSimpleHtmlEmail("Foody admin message", subject, message),
+        });
+    } catch (error) {
         return NextResponse.json(
             {
-                error:
-                    resendResult?.message ||
-                    resendResult?.error?.message ||
-                    "Resend could not send the email.",
+                error: error instanceof Error ? error.message : "Resend could not send the email.",
             },
             { status: 502 },
         );
@@ -139,9 +101,9 @@ export async function POST(request: Request) {
         subject,
         message,
         status: "sent",
-        resendId: resendResult?.id,
+        resendId: resendResult.id,
         sentAt: new Date().toISOString(),
     });
 
-    return NextResponse.json({ success: true, id: resendResult?.id });
+    return NextResponse.json({ success: true, id: resendResult.id });
 }
