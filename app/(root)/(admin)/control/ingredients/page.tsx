@@ -1,4 +1,5 @@
 import AdminPagination from "@/components/admin/AdminPagination";
+import IngredientExcelImportForm from "@/components/admin/IngredientExcelImportForm";
 import { ADMIN_PAGE_SIZE, getPagination, getTotalPages } from "@/lib/admin-pagination";
 import { UpdateIngredient } from "@/lib/admin-actions";
 import { INGREDIENTS_COUNT_QUERY, PAGINATED_INGREDIENTS_QUERY } from "@/sanity/lib/query";
@@ -42,6 +43,8 @@ export default async function IngredientsPage({ searchParams }: IngredientsPageP
                     Showing {ingredients.length} of {totalIngredients} ingredients
                 </p>
             </section>
+
+            <IngredientExcelImportForm />
 
             <div className="space-y-4">
                 {ingredients.length ? (
