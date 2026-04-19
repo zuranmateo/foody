@@ -71,12 +71,12 @@ export default async function page(){
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-12">
       <div className="text-center space-y-4">
-        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+        <h1 className="text-4xl md:text-5xl font-bold bg-linear-to-r from-primary to-secondary bg-clip-text text-transparent">
           MENU
         </h1>
-        <div className="h-64 md:h-80 bg-gradient-to-r from-muted to-muted-foreground/30 rounded-3xl overflow-hidden mx-auto max-w-4xl shadow-2xl">
+        <div className="h-64 md:h-80 bg-linear-to-r from-muted to-muted-foreground/30 rounded-3xl overflow-hidden mx-auto max-w-4xl shadow-2xl">
           {/* Hero image placeholder - add your food image here */}
-          <div className="h-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
+          <div className="h-full bg-linear-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
             <span className="text-2xl text-muted-foreground/50">Delicious food awaits...</span>
           </div>
         </div>

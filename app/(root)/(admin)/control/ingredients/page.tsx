@@ -1,7 +1,15 @@
 import AdminPagination from "@/components/admin/AdminPagination";
-import { ADMIN_PAGE_SIZE, getPagination, getTotalPages } from "@/lib/admin-pagination";
+import IngredientStockGraph from "@/components/graphs/IngredientStockGraph";
+import IngredientUsageGraph from "@/components/graphs/IngredientUsageGraph";
 import { UpdateIngredient } from "@/lib/admin-actions";
-import { INGREDIENTS_COUNT_QUERY, PAGINATED_INGREDIENTS_QUERY } from "@/sanity/lib/query";
+import { buildAdminAnalytics, type AnalyticsIngredient, type AnalyticsOrder } from "@/lib/admin-analytics";
+import { ADMIN_PAGE_SIZE, getPagination, getTotalPages } from "@/lib/admin-pagination";
+import {
+    ADMIN_ANALYTICS_ORDERS_QUERY,
+    ALL_INGREDIENTS_QUERY,
+    INGREDIENTS_COUNT_QUERY,
+    PAGINATED_INGREDIENTS_QUERY,
+} from "@/sanity/lib/query";
 import { writeClient } from "@/sanity/lib/write-client";
 
 type Ingredient = {
@@ -23,13 +31,18 @@ type IngredientsPageProps = {
 export default async function IngredientsPage({ searchParams }: IngredientsPageProps) {
     const { page: pageParam } = await searchParams;
     const pagination = getPagination(pageParam, ADMIN_PAGE_SIZE);
-    const totalIngredients = await writeClient.fetch<number>(INGREDIENTS_COUNT_QUERY);
+    const [totalIngredients, analyticsOrders, allIngredients] = await Promise.all([
+        writeClient.fetch<number>(INGREDIENTS_COUNT_QUERY),
+        writeClient.fetch<AnalyticsOrder[]>(ADMIN_ANALYTICS_ORDERS_QUERY),
+        writeClient.fetch<AnalyticsIngredient[]>(ALL_INGREDIENTS_QUERY),
+    ]);
     const totalPages = getTotalPages(totalIngredients, ADMIN_PAGE_SIZE);
     const currentPage = Math.min(pagination.page, totalPages);
     const ingredients = await writeClient.fetch<Ingredient[]>(PAGINATED_INGREDIENTS_QUERY, {
         start: (currentPage - 1) * ADMIN_PAGE_SIZE,
         end: currentPage * ADMIN_PAGE_SIZE,
     });
+    const analytics = buildAdminAnalytics(analyticsOrders, allIngredients);
 
     return (
         <div className="space-y-6">
@@ -41,6 +54,11 @@ export default async function IngredientsPage({ searchParams }: IngredientsPageP
                 <p className="mt-2 text-sm text-muted-foreground">
                     Showing {ingredients.length} of {totalIngredients} ingredients
                 </p>
+            </section>
+
+            <section className="grid gap-4 xl:grid-cols-2">
+                <IngredientUsageGraph data={analytics.ingredientUsage} />
+                <IngredientStockGraph data={analytics.ingredientStock} />
             </section>
 
             <div className="space-y-4">

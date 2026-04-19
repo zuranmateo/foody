@@ -1,8 +1,12 @@
 import AdminPagination from "@/components/admin/AdminPagination";
+import MostOrderedDishDisplay from "@/components/graphs/MostOrderedDishDisplay";
 import { ADMIN_PAGE_SIZE, getPagination, getTotalPages } from "@/lib/admin-pagination";
 import { CreateDish, DeleteDish, UpdateDish } from "@/lib/admin-actions";
+import { buildAdminAnalytics, type AnalyticsIngredient, type AnalyticsOrder } from "@/lib/admin-analytics";
 import {
+    ADMIN_ANALYTICS_ORDERS_QUERY,
     ADMIN_DISH_FORM_INGREDIENTS_QUERY,
+    ALL_INGREDIENTS_QUERY,
     DISHES_COUNT_QUERY,
     PAGINATED_DISHES_QUERY,
 } from "@/sanity/lib/query";
@@ -55,9 +59,11 @@ const categories = [
 export default async function DishesPage({ searchParams }: DishesPageProps) {
     const { page: pageParam } = await searchParams;
     const pagination = getPagination(pageParam, ADMIN_PAGE_SIZE);
-    const [totalDishes, ingredients] = await Promise.all([
+    const [totalDishes, ingredients, analyticsOrders, allIngredients] = await Promise.all([
         writeClient.fetch<number>(DISHES_COUNT_QUERY),
         writeClient.fetch<IngredientOption[]>(ADMIN_DISH_FORM_INGREDIENTS_QUERY),
+        writeClient.fetch<AnalyticsOrder[]>(ADMIN_ANALYTICS_ORDERS_QUERY),
+        writeClient.fetch<AnalyticsIngredient[]>(ALL_INGREDIENTS_QUERY),
     ]);
     const totalPages = getTotalPages(totalDishes, ADMIN_PAGE_SIZE);
     const currentPage = Math.min(pagination.page, totalPages);
@@ -65,6 +71,7 @@ export default async function DishesPage({ searchParams }: DishesPageProps) {
         start: (currentPage - 1) * ADMIN_PAGE_SIZE,
         end: currentPage * ADMIN_PAGE_SIZE,
     });
+    const analytics = buildAdminAnalytics(analyticsOrders, allIngredients);
 
     return (
         <div className="space-y-8">
@@ -73,6 +80,13 @@ export default async function DishesPage({ searchParams }: DishesPageProps) {
                 <p className="text-sm text-muted-foreground">
                     Add new dishes, edit existing ones, or remove dishes that have not been ordered.
                 </p>
+            </section>
+
+            <section>
+                <MostOrderedDishDisplay
+                    dish={analytics.mostOrderedDish}
+                    topDishes={analytics.topDishes}
+                />
             </section>
 
             <section className="rounded-3xl border p-5">
