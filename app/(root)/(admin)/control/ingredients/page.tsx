@@ -1,7 +1,7 @@
 import AdminPagination from "@/components/admin/AdminPagination";
 import IngredientStockGraph from "@/components/graphs/IngredientStockGraph";
 import IngredientUsageGraph from "@/components/graphs/IngredientUsageGraph";
-import { UpdateIngredient } from "@/lib/admin-actions";
+import { DeleteIngredient, UpdateIngredient } from "@/lib/admin-actions";
 import { buildAdminAnalytics, type AnalyticsIngredient, type AnalyticsOrder } from "@/lib/admin-analytics";
 import { ADMIN_PAGE_SIZE, getPagination, getTotalPages } from "@/lib/admin-pagination";
 import {
@@ -65,71 +65,82 @@ export default async function IngredientsPage({ searchParams }: IngredientsPageP
                 {ingredients.length ? (
                     <>
                         {ingredients.map((ingredient) => (
-                            <form
-                                key={ingredient._id}
-                                action={UpdateIngredient}
-                                className="grid gap-4 rounded-3xl border p-4 lg:grid-cols-[1.4fr_0.8fr_0.7fr_0.7fr_auto]"
-                            >
-                                <input type="hidden" name="ingredientId" value={ingredient._id} />
+                            <div key={ingredient._id} className="space-y-3 rounded-3xl border p-4">
+                                <form
+                                    action={UpdateIngredient}
+                                    className="grid gap-4 lg:grid-cols-[1.4fr_0.8fr_0.7fr_0.7fr_auto]"
+                                >
+                                    <input type="hidden" name="ingredientId" value={ingredient._id} />
 
-                                <label className="space-y-2 text-sm">
-                                    <span className="text-muted-foreground">Name</span>
-                                    <input
-                                        name="name"
-                                        defaultValue={ingredient.name}
-                                        className="w-full rounded-2xl border bg-background px-3 py-2"
-                                        required
-                                    />
-                                </label>
+                                    <label className="space-y-2 text-sm">
+                                        <span className="text-muted-foreground">Name</span>
+                                        <input
+                                            name="name"
+                                            defaultValue={ingredient.name}
+                                            className="w-full rounded-2xl border bg-background px-3 py-2"
+                                            required
+                                        />
+                                    </label>
 
-                                <label className="space-y-2 text-sm">
-                                    <span className="text-muted-foreground">Quantity</span>
-                                    <input
-                                        name="quantity"
-                                        type="number"
-                                        min="0"
-                                        step="0.01"
-                                        defaultValue={ingredient.quantity ?? 0}
-                                        className="w-full rounded-2xl border bg-background px-3 py-2"
-                                    />
-                                </label>
+                                    <label className="space-y-2 text-sm">
+                                        <span className="text-muted-foreground">Quantity</span>
+                                        <input
+                                            name="quantity"
+                                            type="number"
+                                            min="0"
+                                            step="0.01"
+                                            defaultValue={ingredient.quantity ?? 0}
+                                            className="w-full rounded-2xl border bg-background px-3 py-2"
+                                        />
+                                    </label>
 
-                                <label className="space-y-2 text-sm">
-                                    <span className="text-muted-foreground">Unit</span>
-                                    <select
-                                        name="unit"
-                                        defaultValue={ingredient.unit ?? "g"}
-                                        className="w-full rounded-2xl border bg-background px-3 py-2"
-                                    >
-                                        {units.map((unit) => (
-                                            <option key={unit} value={unit}>
-                                                {unit}
-                                            </option>
-                                        ))}
-                                    </select>
-                                </label>
+                                    <label className="space-y-2 text-sm">
+                                        <span className="text-muted-foreground">Unit</span>
+                                        <select
+                                            name="unit"
+                                            defaultValue={ingredient.unit ?? "g"}
+                                            className="w-full rounded-2xl border bg-background px-3 py-2"
+                                        >
+                                            {units.map((unit) => (
+                                                <option key={unit} value={unit}>
+                                                    {unit}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </label>
 
-                                <label className="space-y-2 text-sm">
-                                    <span className="text-muted-foreground">Stock</span>
-                                    <select
-                                        name="inStock"
-                                        defaultValue={ingredient.inStock ? "true" : "false"}
-                                        className="w-full rounded-2xl border bg-background px-3 py-2"
-                                    >
-                                        <option value="true">In stock</option>
-                                        <option value="false">Out of stock</option>
-                                    </select>
-                                </label>
+                                    <label className="space-y-2 text-sm">
+                                        <span className="text-muted-foreground">Stock</span>
+                                        <select
+                                            name="inStock"
+                                            defaultValue={ingredient.inStock ? "true" : "false"}
+                                            className="w-full rounded-2xl border bg-background px-3 py-2"
+                                        >
+                                            <option value="true">In stock</option>
+                                            <option value="false">Out of stock</option>
+                                        </select>
+                                    </label>
 
-                                <div className="flex items-end">
+                                    <div className="flex items-end">
+                                        <button
+                                            type="submit"
+                                            className="w-full rounded-2xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground lg:w-auto"
+                                        >
+                                            Save
+                                        </button>
+                                    </div>
+                                </form>
+
+                                <form action={DeleteIngredient} className="text-right">
+                                    <input type="hidden" name="ingredientId" value={ingredient._id} />
                                     <button
                                         type="submit"
-                                        className="w-full rounded-2xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground lg:w-auto"
+                                        className="w-full rounded-2xl bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700 lg:w-auto"
                                     >
-                                        Save
+                                        Delete
                                     </button>
-                                </div>
-                            </form>
+                                </form>
+                            </div>
                         ))}
                         <AdminPagination
                             basePath="/control/ingredients"

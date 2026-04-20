@@ -80,7 +80,6 @@ export default async function UserPage({ params }: UserPageProps) {
             <p>{user?.email}</p>
             {user?.phone ? <p>{user?.phone}</p> : null}
             {user?.address ? <p>{user?.address}</p> : null}
-            {user?.role ? <p>Role: {user?.role}</p> : null}
           </div>
         </div>
 

@@ -3,6 +3,7 @@ import AdminPagination from "@/components/admin/AdminPagination";
 import OrdersPerDayGraph from "@/components/graphs/OrdersPerDayGraph";
 import OrderStatusBar from "@/components/graphs/OrderStatusBar";
 import WeeklyRevenueGraph from "@/components/graphs/WeeklyRevenueGraph";
+import MostOrderedDishDisplay from "@/components/graphs/MostOrderedDishDisplay";
 import { buildAdminAnalytics, type AnalyticsIngredient, type AnalyticsOrder } from "@/lib/admin-analytics";
 import { ADMIN_PAGE_SIZE, getPagination, getTotalPages } from "@/lib/admin-pagination";
 import {
@@ -72,7 +73,7 @@ export default async function OrdersPage({ searchParams }: OrdersPageProps) {
 
     return (
         <div className="space-y-6">
-            <section className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
+            <section className="grid gap-4 md:grid-cols-2">
                 <WeeklyRevenueGraph data={analytics.weeklyRevenue} />
                 <OrderStatusBar
                     pending={analytics.statusBreakdown.pending}
@@ -81,8 +82,12 @@ export default async function OrdersPage({ searchParams }: OrdersPageProps) {
                 />
             </section>
 
-            <section>
+            <section className="grid gap-4 md:grid-cols-2">
                 <OrdersPerDayGraph data={analytics.ordersPerDay} />
+                <MostOrderedDishDisplay
+                    dish={analytics.mostOrderedDish}
+                    topDishes={analytics.topDishes}
+                />
             </section>
 
             <section className="flex flex-wrap gap-3">

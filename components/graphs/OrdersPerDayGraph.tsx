@@ -1,33 +1,32 @@
+"use client"
 import type { GraphPoint } from "@/lib/admin-analytics";
-import GraphCard from "./GraphCard";
+import { LineChart, XAxis, YAxis, LabelList, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Line } from 'recharts';
 
 type OrdersPerDayGraphProps = {
     data: GraphPoint[];
 };
 
 export default function OrdersPerDayGraph({ data }: OrdersPerDayGraphProps) {
-    const maxValue = Math.max(...data.map((point) => point.value), 1);
 
     return (
-        <GraphCard title="Number Of Orders Per Day" description="Daily order volume for the last week.">
-            <div className="flex h-64 items-end gap-3">
-                {data.map((point) => {
-                    const height = `${Math.max((point.value / maxValue) * 100, point.value > 0 ? 14 : 6)}%`;
-
-                    return (
-                        <div key={point.label} className="flex flex-1 flex-col items-center gap-3">
-                            <p className="text-sm font-semibold">{point.value}</p>
-                            <div className="flex h-full w-full items-end rounded-3xl bg-muted/50 p-2">
-                                <div
-                                    className="w-full rounded-2xl bg-slate-900 transition-all"
-                                    style={{ height }}
-                                />
-                            </div>
-                            <p className="text-xs text-muted-foreground">{point.label}</p>
-                        </div>
-                    );
-                })}
+         <div style={{ width: '80%', maxWidth: "400", height: 250, aspectRatio: 1.618, }} className="shadow-2xl rounded-2xl border px-2 py-5 my-5 mx-2">
+                <h2 className="text-2xl px-4">
+                        ORDERS PER DAY
+                    </h2>
+              <ResponsiveContainer>
+                <LineChart data={data} margin={{ top: 20, right: 20, left: 10, bottom: 30 }}>
+                  <XAxis dataKey="label"/>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <YAxis />
+                  <Tooltip />
+                  <Line dataKey="value" type={"monotone"} color='#000000' fill='#FF2B00'>
+                    <LabelList 
+                        dataKey={"value"}
+                        position={'top'}
+                    />
+                  </Line>
+                </LineChart>
+              </ResponsiveContainer>
             </div>
-        </GraphCard>
     );
 }

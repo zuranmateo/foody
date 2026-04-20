@@ -1,4 +1,5 @@
-import GraphCard from "./GraphCard";
+"use client"
+import { XAxis, YAxis, LabelList, Tooltip, BarChart, ResponsiveContainer, Bar } from 'recharts';
 
 type OrderStatusBarProps = {
     pending: number;
@@ -11,44 +12,29 @@ export default function OrderStatusBar({
     preparing,
     delivered,
 }: OrderStatusBarProps) {
-    const total = pending + preparing + delivered;
     const segments = [
-        { label: "Pending", value: pending, color: "bg-blue-500" },
-        { label: "Preparing", value: preparing, color: "bg-yellow-400" },
-        { label: "Delivered", value: delivered, color: "bg-green-500" },
+        { label: "Pending", value: pending, color: "#3b82f6" },
+        { label: "Preparing", value: preparing, color: "#eab308" },
+        { label: "Delivered", value: delivered, color: "#22c55e" },
     ];
-
     return (
-        <GraphCard
-            title="Order Status Split"
-            description="Blue is pending, yellow is preparing, and green is delivered."
-            action={<p className="text-sm font-semibold">{total} total</p>}
-        >
-            <div className="space-y-4">
-                <div className="flex h-6 overflow-hidden rounded-full bg-muted">
-                    {segments.map((segment) => (
-                        <div
-                            key={segment.label}
-                            className={segment.color}
-                            style={{
-                                width: total ? `${(segment.value / total) * 100}%` : "33.333%",
-                            }}
-                        />
-                    ))}
-                </div>
-
-                <div className="grid gap-3 sm:grid-cols-3">
-                    {segments.map((segment) => (
-                        <div key={segment.label} className="rounded-2xl border bg-muted/30 p-4">
-                            <div className="flex items-center gap-2 text-sm">
-                                <span className={`h-3 w-3 rounded-full ${segment.color}`} />
-                                <span className="text-muted-foreground">{segment.label}</span>
-                            </div>
-                            <p className="mt-2 text-2xl font-semibold">{segment.value}</p>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        </GraphCard>
+        <div style={{ width: '80%', maxWidth: "400", height: 250, aspectRatio: 1.618, }} className="shadow-2xl rounded-2xl border py-5 my-5 mx-2">
+                    <h2 className="text-2xl px-4">
+                        MOST ORDERED DISHES
+                    </h2>
+                      <ResponsiveContainer>
+                        <BarChart data={segments} margin={{ top: 20, right: 20, left: 10, bottom: 30 }}>
+                          <XAxis dataKey="label"/>
+                          <YAxis />
+                          <Tooltip />
+                          <Bar dataKey="value" barSize={40} fill="#31F527">
+                                      <LabelList 
+                                          dataKey={"value"}
+                                          position={'top'}
+                                      />
+                                    </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
     );
 }

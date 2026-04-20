@@ -46,6 +46,7 @@ export default async function DashboardPage() {
     ]);
 
     const analytics = buildAdminAnalytics(analyticsOrders, ingredients);
+    //console.log(analytics.mostOrderedDish, analytics.topDishes);
     const recentOrders = orders.slice(0, 5);
     const cards = [
         { label: "Total orders", value: stats?.totalOrders ?? 0 },
@@ -65,7 +66,7 @@ export default async function DashboardPage() {
                 ))}
             </section>
 
-            <section className="grid gap-4 xl:grid-cols-[1.15fr_0.85fr]">
+            <section className="flex">
                 <WeeklyRevenueGraph data={analytics.weeklyRevenue} />
                 <OrderStatusBar
                     pending={analytics.statusBreakdown.pending}
@@ -74,7 +75,7 @@ export default async function DashboardPage() {
                 />
             </section>
 
-            <section className="grid gap-4 xl:grid-cols-2">
+            <section className="flex my-5">
                 <OrdersPerDayGraph data={analytics.ordersPerDay} />
                 <MostOrderedDishDisplay
                     dish={analytics.mostOrderedDish}
@@ -82,7 +83,7 @@ export default async function DashboardPage() {
                 />
             </section>
 
-            <section className="grid gap-4 xl:grid-cols-2">
+            <section className="flex">
                 <IngredientUsageGraph data={analytics.ingredientUsage} />
                 <IngredientStockGraph data={analytics.ingredientStock} />
             </section>

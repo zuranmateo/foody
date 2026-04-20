@@ -1,6 +1,6 @@
 import Link from "next/link"
 import Image from "next/image"
-import { auth, signOut } from "@/auth"
+import { auth } from "@/auth"
 import KartNumber from "./ui/KartNumber";
 import { SanityLive } from '@/sanity/lib/live';
 
@@ -39,9 +39,6 @@ export default async function Navbar() {
                   <KartNumber/>
                 </Link>
                 <Link href={`/user/${session?.user._id}`} className="flex justify-between items-center mr-5">
-                  <span className="text-base md:text-base lg:text-xl">
-                    {session?.user?.name}
-                  </span>
                   <Image src={`${session?.user?.image || session?.user?.imageUrl || "/defaultProfileImg.png"}`}  alt="profile picture" height={50} width={50} className="rounded-full border-3 mx-2 lg:mx-3 lg:h-9 lg:w-9 h-7 w-7 object-cover" />
                 </Link>
             </>

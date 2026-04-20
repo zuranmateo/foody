@@ -1,52 +1,32 @@
-import type { IngredientStockPoint } from "@/lib/admin-analytics";
-import GraphCard from "./GraphCard";
+"use client";
 
-type IngredientStockGraphProps = {
-    data: IngredientStockPoint[];
+import type { IngredientStockPoint } from '@/lib/admin-analytics';
+import { BarChart, XAxis, YAxis, LabelList, Tooltip, Legend, ResponsiveContainer, Bar } from 'recharts';
+
+type Props = {
+  data: IngredientStockPoint[];
 };
 
-export default function IngredientStockGraph({ data }: IngredientStockGraphProps) {
-    const maxValue = Math.max(...data.map((point) => point.value), 1);
-
-    return (
-        <GraphCard
-            title="Ingredient Stock Graph"
-            description="Lowest stock ingredients, with out-of-stock items surfaced first."
-        >
-            <div className="space-y-3">
-                {data.length ? (
-                    data.map((point) => (
-                        <div
-                            key={point.label}
-                            className={`rounded-2xl border px-4 py-3 ${
-                                point.inStock ? "bg-emerald-50/60" : "bg-rose-50/70"
-                            }`}
-                        >
-                            <div className="flex items-center justify-between gap-3">
-                                <div>
-                                    <p className="font-medium">{point.label}</p>
-                                    <p className="text-xs text-muted-foreground">
-                                        {point.inStock ? "In stock" : "Restock needed"}
-                                    </p>
-                                </div>
-                                <p className="text-sm font-semibold">
-                                    {point.value.toFixed(2)} {point.unit}
-                                </p>
-                            </div>
-                            <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/80">
-                                <div
-                                    className={`h-full rounded-full ${
-                                        point.inStock ? "bg-emerald-500" : "bg-rose-500"
-                                    }`}
-                                    style={{ width: `${Math.max((point.value / maxValue) * 100, point.value > 0 ? 10 : 4)}%` }}
-                                />
-                            </div>
-                        </div>
-                    ))
-                ) : (
-                    <p className="text-sm text-muted-foreground">No ingredient data is available yet.</p>
-                )}
-            </div>
-        </GraphCard>
-    );
+export default function IngredientStockGraph({ data }: Props) {
+    //console.log(data)
+  return (
+    <div style={{ width: '80%', maxWidth: "400", height: 250, aspectRatio: 1.618, }} className="shadow-2xl rounded-2xl border px-2 py-5 my-5 mx-2">
+        <h2 className="text-2xl px-4">
+                INGRIDIENT STOCK
+            </h2>
+      <ResponsiveContainer>
+        <BarChart data={data} margin={{ top: 20, right: 20, left: 10, bottom: 30 }}>
+          <XAxis dataKey="label"/>
+          <YAxis />
+          <Tooltip />
+          <Bar dataKey="value" barSize={20} color='#000000' fill='#FF2B00'>
+            <LabelList 
+                dataKey={"value"}
+                position={'top'}
+            />
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
 }

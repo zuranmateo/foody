@@ -276,6 +276,21 @@ export async function DeleteDish(formData: FormData) {
     revalidatePath("/control/dashboard");
 }
 
+export async function DeleteIngredient(formData: FormData) {
+    await requireAdmin();
+
+    const ingredientId = String(formData.get("ingredientId") ?? "");
+
+    if (!ingredientId) {
+        throw new Error("Ingredient id is required.");
+    }
+
+    await writeClient.delete(ingredientId);
+
+    revalidatePath("/control/ingredients");
+    revalidatePath("/control/dashboard");
+}
+
 export async function ToggleDishAvailability(formData: FormData) {
     await requireAdmin();
 
