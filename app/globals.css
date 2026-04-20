@@ -117,6 +117,27 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+@layer utilities{
+  .mainDIV{
+    @apply relative text-center flex h-screen flex-col items-center justify-center bg-linear-to-br from-red-900 via-red-800 to-slate-900 px-6;
+  }
+  .text{
+    @apply relative mb-6 font-extrabold uppercase tracking-tight text-white sm:text-5xl md:text-6xl;
+  }
+  .h1{
+    @apply relative mb-6 text-4xl max-w-200 font-extrabold uppercase tracking-tight text-white sm:text-5xl md:text-6xl;
+  }
+  .navbar{
+    @apply font-mono uppercase shadow-2xl;
+  }
+  .card{
+    @apply max-w-150 max-h-300 m-5;
+  }
+  .h2{
+    @apply uppercase text-xl font-bold m-4 text-black;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

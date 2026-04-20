@@ -1,33 +1,74 @@
 import Link from "next/link"
 import Image from "next/image"
-import { auth, signOut } from "@/auth"
+import { auth } from "@/auth"
+import KartNumber from "./ui/KartNumber";
+import { SanityLive } from '@/sanity/lib/live';
 
 export default async function Navbar() {
 
   const session = await auth();
 
   return (
-      <nav className="navbar">
-            <Link href="/" className="flex justify-between">
+      <nav className="shadow-2xl flex items-center justify-between w-full">
+      <style>{`
+          body {
+          font-family: Arial, sans-serif;
+          background: #f9f9f9;
+          }
+    `}</style>  
+            <Link href="/">
                 <Image
-                  src="/logoName.png"
+                  src="/logo.png"
                   alt="logo"
-                  width={150}
-                  height={75}
+                  width={100}
+                  height={100}
                 />
             </Link>
-
-            <div className="flex flex-row items-center gap-3 lg:gap-5">
+  
+            <div className="flex gap-5 mx-5 items-center ">
               
             {/* Če je uporabnik prijavljen */}
             {session && session?.user ?
             (
               <>
-                <Link href="/order">
-                  <span className="block bg-primary text-white py-2 px-4 lg:text-xl md:text-sm text-sm rounded-xl">NAROČI ANALIZO</span>
+                <Link href="/menu">
+                  <span className="navbar">Menu</span>
                 </Link>
 
-                <form action={async() => {
+                <Link href="/">
+                  <span className="navbar">Home</span>
+                </Link>
+
+                {session.user.role === "admin" ? (
+                  <Link href="/control">
+                    <span className="navbar">
+                      Admin
+                    </span>
+                  </Link>
+                ) : null}
+
+                <Link href="/cart">
+                  <KartNumber/>
+                </Link>
+                <Link href={`/user/${session?.user._id}`} className="flex justify-between items-center mr-5">
+                  <Image src={`${session?.user?.image || session?.user?.imageUrl || "/defaultProfileImg.png"}`}  alt="profile picture" height={50} width={50} className="rounded-full border-3 mx-2 lg:mx-3 lg:h-9 lg:w-9 h-7 w-7 object-cover" />
+                </Link>
+            </>
+          ):(
+            <button className="navbar mx-5 gap-5">
+                <Link href="/login">
+                    Login
+                </Link>
+            </button>
+          )}
+        </div>
+        <SanityLive />
+      </nav>
+  );
+}
+
+/**signout koda
+ * <form action={async() => {
                   "use server"
                   await signOut({ redirectTo: "/" });
                 }}>
@@ -35,21 +76,4 @@ export default async function Navbar() {
                     Logout
                   </button>
                 </form>
-                <Link href={`/profile/${session?.user?._id}`} className="flex justify-between items-center mr-5">
-                  <span className="text-base md:text-base lg:text-xl">
-                    {session?.user?.name}
-                  </span>
-                  <Image src={`${session?.user?.image || session?.user?.imageUrl || "/defaultProfileImg.png"}`}  alt="profile picture" height={50} width={50} className="rounded-full border-3 mx-2 lg:mx-3 lg:h-9 lg:w-9 h-7 w-7 object-cover" />
-                </Link>
-            </>
-          ):(
-            <button className="block py-2 px-5 mr-5 text-center bg-primary rounded-2xl text-white">
-                <Link href="/login">
-                    Login
-                </Link>
-            </button>
-          )}
-        </div>
-      </nav>
-  );
-}
+ */

@@ -17,6 +17,11 @@ export const users = defineType({
       validation: Rule => Rule.required()
     }),
     defineField({
+      name: 'surname',
+      title: 'Priimek',
+      type: 'string',
+    }),
+    defineField({
       name: 'email',
       title: 'Email',
       type: 'string',
@@ -54,7 +59,7 @@ export const users = defineType({
     defineField({
       name: 'imageUrl',
       title: 'Profilna slika github',
-      type: 'image'
+      type: 'string'
     })
   ],
   preview: {
