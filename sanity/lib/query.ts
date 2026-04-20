@@ -265,6 +265,31 @@ export const ADMIN_ORDERS_QUERY = defineQuery(`
    }
 `)
 
+export const ADMIN_ANALYTICS_ORDERS_QUERY = defineQuery(`
+   *[_type == "orders"] | order(_createdAt desc){
+      _id,
+      _createdAt,
+      totalPrice,
+      status,
+      items[]{
+         quantity,
+         dish->{
+            _id,
+            name,
+            price,
+            ingredients[]{
+               quantity,
+               ingredient->{
+                  _id,
+                  name,
+                  unit
+               }
+            }
+         }
+      }
+   }
+`)
+
 export const ADMIN_DASHBOARD_STATS_QUERY = defineQuery(`
    {
       "totalOrders": count(*[_type == "orders"]),

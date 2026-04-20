@@ -1,7 +1,17 @@
 import OrderCard from "@/components/cards/OrderCard";
 import AdminPagination from "@/components/admin/AdminPagination";
+import OrdersPerDayGraph from "@/components/graphs/OrdersPerDayGraph";
+import OrderStatusBar from "@/components/graphs/OrderStatusBar";
+import WeeklyRevenueGraph from "@/components/graphs/WeeklyRevenueGraph";
+import MostOrderedDishDisplay from "@/components/graphs/MostOrderedDishDisplay";
+import { buildAdminAnalytics, type AnalyticsIngredient, type AnalyticsOrder } from "@/lib/admin-analytics";
 import { ADMIN_PAGE_SIZE, getPagination, getTotalPages } from "@/lib/admin-pagination";
-import { ADMIN_ORDERS_COUNT_QUERY, PAGINATED_ADMIN_ORDERS_QUERY } from "@/sanity/lib/query";
+import {
+    ADMIN_ANALYTICS_ORDERS_QUERY,
+    ADMIN_ORDERS_COUNT_QUERY,
+    ALL_INGREDIENTS_QUERY,
+    PAGINATED_ADMIN_ORDERS_QUERY,
+} from "@/sanity/lib/query";
 import { writeClient } from "@/sanity/lib/write-client";
 import Link from "next/link";
 
@@ -45,9 +55,13 @@ export default async function OrdersPage({ searchParams }: OrdersPageProps) {
     const { status, page: pageParam } = await searchParams;
     const activeFilter = filters.some((filter) => filter.value === status) ? status! : "pending";
     const pagination = getPagination(pageParam, ADMIN_PAGE_SIZE);
-    const totalOrders = await writeClient.fetch<number>(ADMIN_ORDERS_COUNT_QUERY, {
-        status: activeFilter,
-    });
+    const [totalOrders, analyticsOrders, ingredients] = await Promise.all([
+        writeClient.fetch<number>(ADMIN_ORDERS_COUNT_QUERY, {
+            status: activeFilter,
+        }),
+        writeClient.fetch<AnalyticsOrder[]>(ADMIN_ANALYTICS_ORDERS_QUERY),
+        writeClient.fetch<AnalyticsIngredient[]>(ALL_INGREDIENTS_QUERY),
+    ]);
     const totalPages = getTotalPages(totalOrders, ADMIN_PAGE_SIZE);
     const currentPage = Math.min(pagination.page, totalPages);
     const visibleOrders = await writeClient.fetch<AdminOrder[]>(PAGINATED_ADMIN_ORDERS_QUERY, {
@@ -55,9 +69,27 @@ export default async function OrdersPage({ searchParams }: OrdersPageProps) {
         start: (currentPage - 1) * ADMIN_PAGE_SIZE,
         end: currentPage * ADMIN_PAGE_SIZE,
     });
+    const analytics = buildAdminAnalytics(analyticsOrders, ingredients);
 
     return (
         <div className="space-y-6">
+            <section className="grid gap-4 md:grid-cols-2">
+                <WeeklyRevenueGraph data={analytics.weeklyRevenue} />
+                <OrderStatusBar
+                    pending={analytics.statusBreakdown.pending}
+                    preparing={analytics.statusBreakdown.preparing}
+                    delivered={analytics.statusBreakdown.delivered}
+                />
+            </section>
+
+            <section className="grid gap-4 md:grid-cols-2">
+                <OrdersPerDayGraph data={analytics.ordersPerDay} />
+                <MostOrderedDishDisplay
+                    dish={analytics.mostOrderedDish}
+                    topDishes={analytics.topDishes}
+                />
+            </section>
+
             <section className="flex flex-wrap gap-3">
                 {filters.map((filter) => {
                     const isActive = activeFilter === filter.value;
