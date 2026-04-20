@@ -9,32 +9,44 @@ export default async function Navbar() {
   const session = await auth();
 
   return (
-      <nav className="shadow-2xl">
-            <Link href="/" className="flex justify-between">
+      <nav className="shadow-2xl flex items-center justify-between w-full">
+      <style>{`
+          body {
+          font-family: Arial, sans-serif;
+          background: #f9f9f9;
+          }
+    `}</style>  
+            <Link href="/">
                 <Image
-                  src="/defaultProfileImg.png"
+                  src="/logo.png"
                   alt="logo"
-                  width={150}
-                  height={75}
+                  width={100}
+                  height={100}
                 />
             </Link>
-
-            <div className="flex flex-row items-center gap-3 lg:gap-5">
+  
+            <div className="flex gap-5 mx-5 items-center ">
               
             {/* Če je uporabnik prijavljen */}
             {session && session?.user ?
             (
               <>
                 <Link href="/menu">
-                  <span className="block bg-primary text-white py-2 px-4 lg:text-xl md:text-sm text-sm rounded-xl">MENI</span>
+                  <span className="navbar">Menu</span>
                 </Link>
+
+                <Link href="/">
+                  <span className="navbar">Home</span>
+                </Link>
+
                 {session.user.role === "admin" ? (
                   <Link href="/control">
-                    <span className="block rounded-xl border px-4 py-2 text-sm lg:text-base">
+                    <span className="navbar">
                       Admin
                     </span>
                   </Link>
                 ) : null}
+
                 <Link href="/cart">
                   <KartNumber/>
                 </Link>
@@ -43,7 +55,7 @@ export default async function Navbar() {
                 </Link>
             </>
           ):(
-            <button className="block py-2 px-5 mr-5 text-center bg-primary rounded-2xl text-white">
+            <button className="navbar mx-5 gap-5">
                 <Link href="/login">
                     Login
                 </Link>

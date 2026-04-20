@@ -4,8 +4,345 @@ import { auth } from "@/auth";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { writeClient } from "@/sanity/lib/write-client";
-import { DISH_REFERENCED_IN_ORDERS_QUERY, DISH_SLUG_EXISTS_QUERY } from "@/sanity/lib/query";
+import {
+    ALL_INGREDIENTS_QUERY,
+    DISH_REFERENCED_IN_ORDERS_QUERY,
+    DISH_SLUG_EXISTS_QUERY,
+} from "@/sanity/lib/query";
 import { normalizeText } from "@/lib/validation";
+import * as XLSX from "xlsx";
+
+const allowedIngredientUnits = new Set(["kosov", "mg", "g", "kg", "ml", "l"]);
+
+export type ImportIngredientsState = {
+    status: "idle" | "success" | "error";
+    message: string;
+    summary?: {
+        created: number;
+        updated: number;
+        rowsProcessed: number;
+    };
+};
+
+const initialImportIngredientsState: ImportIngredientsState = {
+    status: "idle",
+    message: "",
+};
+
+type IngredientRow = {
+    name?: string;
+    quantity?: string | number;
+    unit?: string;
+    inStock?: string | boolean;
+};
+
+type ExistingIngredient = {
+    _id: string;
+    name: string;
+    quantity?: number;
+    unit?: string;
+    inStock?: boolean;
+};
+
+function normalizeIngredientName(value: string) {
+    return value
+        .normalize("NFKC")
+        .trim()
+        .replace(/\s+/g, " ")
+        .toLowerCase();
+}
+
+function parseIngredientNumber(value: string | number | undefined, rowNumber: number) {
+    const raw = String(value ?? "").trim().replace(",", ".");
+
+    if (!raw) {
+        throw new Error(`Row ${rowNumber}: quantity is required.`);
+    }
+
+    const parsed = Number(raw);
+
+    if (!Number.isFinite(parsed) || parsed < 0) {
+        throw new Error(`Row ${rowNumber}: quantity must be a non-negative number.`);
+    }
+
+    return Number(parsed.toFixed(2));
+}
+
+function parseIngredientUnit(value: string | undefined, rowNumber: number) {
+    const unit = String(value ?? "").trim().toLowerCase();
+
+    if (!unit) {
+        throw new Error(`Row ${rowNumber}: unit is required.`);
+    }
+
+    if (!allowedIngredientUnits.has(unit)) {
+        throw new Error(
+            `Row ${rowNumber}: unit "${unit}" is invalid. Allowed units: ${Array.from(allowedIngredientUnits).join(", ")}.`,
+        );
+    }
+
+    return unit;
+}
+
+function parseOptionalStockValue(value: string | boolean | undefined, rowNumber: number) {
+    if (value === undefined || value === null || String(value).trim() === "") {
+        return {
+            hasValue: false,
+            value: false,
+        };
+    }
+
+    if (typeof value === "boolean") {
+        return {
+            hasValue: true,
+            value,
+        };
+    }
+
+    const normalized = String(value).trim().toLowerCase();
+
+    if (["true", "yes", "1", "in stock", "instock"].includes(normalized)) {
+        return {
+            hasValue: true,
+            value: true,
+        };
+    }
+
+    if (["false", "no", "0", "out of stock", "outofstock"].includes(normalized)) {
+        return {
+            hasValue: true,
+            value: false,
+        };
+    }
+
+    throw new Error(
+        `Row ${rowNumber}: inStock must be true/false, yes/no, 1/0, in stock/out of stock.`,
+    );
+}
+
+function createIngredientDocumentId(name: string) {
+    const slug = name
+        .normalize("NFKD")
+        .replace(/[^\w\s-]/g, "")
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "");
+
+    return `ingredient-${slug || crypto.randomUUID()}-${crypto.randomUUID().slice(0, 8)}`;
+}
+
+export async function ImportIngredientsFromExcel(
+    _previousState: ImportIngredientsState = initialImportIngredientsState,
+    formData: FormData,
+): Promise<ImportIngredientsState> {
+    try {
+        void _previousState;
+        await requireAdmin();
+
+        const confirmation = String(formData.get("confirmImport") ?? "");
+
+        if (confirmation !== "on") {
+            return {
+                status: "error",
+                message: "Confirm the import before uploading ingredients.",
+            };
+        }
+
+        const file = formData.get("excelFile");
+
+        if (!(file instanceof File)) {
+            return {
+                status: "error",
+                message: "Choose an Excel file before importing.",
+            };
+        }
+
+        if (!file.name.toLowerCase().endsWith(".xlsx") && !file.name.toLowerCase().endsWith(".xls")) {
+            return {
+                status: "error",
+                message: "Only .xlsx or .xls files are supported.",
+            };
+        }
+
+        const buffer = Buffer.from(await file.arrayBuffer());
+        const workbook = XLSX.read(buffer, { type: "buffer" });
+        const firstSheetName = workbook.SheetNames[0];
+
+        if (!firstSheetName) {
+            return {
+                status: "error",
+                message: "The Excel file does not contain any sheets.",
+            };
+        }
+
+        const worksheet = workbook.Sheets[firstSheetName];
+        const rows = XLSX.utils.sheet_to_json<IngredientRow>(worksheet, {
+            defval: "",
+        });
+        const headerKeys = Object.keys(rows[0] ?? {}).map((key) => key.trim());
+        const requiredHeaders = ["name", "quantity", "unit"];
+
+        if (!rows.length) {
+            return {
+                status: "error",
+                message: "The Excel sheet is empty.",
+            };
+        }
+
+        const missingHeaders = requiredHeaders.filter((header) => !headerKeys.includes(header));
+
+        if (missingHeaders.length > 0) {
+            return {
+                status: "error",
+                message: `Missing required column(s): ${missingHeaders.join(", ")}. Expected headers: name, quantity, unit, inStock.`,
+            };
+        }
+
+        const aggregatedRows = new Map<
+            string,
+            {
+                name: string;
+                quantity: number;
+                unit: string;
+                hasExplicitStock: boolean;
+                explicitStockValue: boolean;
+            }
+        >();
+
+        rows.forEach((row, index) => {
+            const rowNumber = index + 2;
+            const name = String(row.name ?? "").trim();
+
+            if (!name) {
+                throw new Error(`Row ${rowNumber}: name is required.`);
+            }
+
+            const quantity = parseIngredientNumber(row.quantity, rowNumber);
+            const unit = parseIngredientUnit(row.unit, rowNumber);
+            const stock = parseOptionalStockValue(row.inStock, rowNumber);
+            const key = normalizeIngredientName(name);
+            const existing = aggregatedRows.get(key);
+
+            if (existing) {
+                if (existing.unit !== unit) {
+                    throw new Error(
+                        `Row ${rowNumber}: ingredient "${name}" is repeated with a different unit.`,
+                    );
+                }
+
+                if (
+                    stock.hasValue &&
+                    existing.hasExplicitStock &&
+                    existing.explicitStockValue !== stock.value
+                ) {
+                    throw new Error(
+                        `Row ${rowNumber}: ingredient "${name}" has conflicting inStock values.`,
+                    );
+                }
+
+                existing.quantity = Number((existing.quantity + quantity).toFixed(2));
+
+                if (stock.hasValue) {
+                    existing.hasExplicitStock = true;
+                    existing.explicitStockValue = stock.value;
+                }
+
+                return;
+            }
+
+            aggregatedRows.set(key, {
+                name,
+                quantity,
+                unit,
+                hasExplicitStock: stock.hasValue,
+                explicitStockValue: stock.value,
+            });
+        });
+
+        const existingIngredients = await writeClient.fetch<ExistingIngredient[]>(ALL_INGREDIENTS_QUERY);
+        const existingIngredientMap = new Map<string, ExistingIngredient>();
+
+        for (const ingredient of existingIngredients) {
+            const key = normalizeIngredientName(ingredient.name);
+            const duplicate = existingIngredientMap.get(key);
+
+            if (duplicate) {
+                return {
+                    status: "error",
+                    message: `Database already contains duplicate ingredients named "${ingredient.name}". Clean those up before importing.`,
+                };
+            }
+
+            existingIngredientMap.set(key, ingredient);
+        }
+
+        const transaction = writeClient.transaction();
+        let created = 0;
+        let updated = 0;
+
+        for (const [key, ingredient] of aggregatedRows.entries()) {
+            const existing = existingIngredientMap.get(key);
+
+            if (existing) {
+                const existingUnit = String(existing.unit ?? "").trim().toLowerCase();
+
+                if (existingUnit && existingUnit !== ingredient.unit) {
+                    return {
+                        status: "error",
+                        message: `Ingredient "${ingredient.name}" already exists with unit "${existing.unit}", but the Excel file uses "${ingredient.unit}".`,
+                    };
+                }
+
+                const nextQuantity = Number((Number(existing.quantity ?? 0) + ingredient.quantity).toFixed(2));
+                const nextInStock = ingredient.hasExplicitStock
+                    ? ingredient.explicitStockValue
+                    : nextQuantity > 0;
+
+                transaction.patch(existing._id, {
+                    set: {
+                        quantity: nextQuantity,
+                        unit: ingredient.unit,
+                        inStock: nextInStock,
+                    },
+                });
+                updated += 1;
+                continue;
+            }
+
+            transaction.create({
+                _id: createIngredientDocumentId(ingredient.name),
+                _type: "ingredients",
+                name: ingredient.name,
+                quantity: ingredient.quantity,
+                unit: ingredient.unit,
+                inStock: ingredient.hasExplicitStock ? ingredient.explicitStockValue : ingredient.quantity > 0,
+            });
+            created += 1;
+        }
+
+        await transaction.commit();
+
+        revalidatePath("/control/ingredients");
+        revalidatePath("/control/dashboard");
+
+        return {
+            status: "success",
+            message: "Excel import completed successfully.",
+            summary: {
+                created,
+                updated,
+                rowsProcessed: rows.length,
+            },
+        };
+    } catch (error) {
+        return {
+            status: "error",
+            message: error instanceof Error ? error.message : "The Excel import failed.",
+        };
+    }
+}
 
 export async function requireAdmin() {
     const session = await auth();

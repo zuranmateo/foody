@@ -170,6 +170,37 @@ export const ORDER_BY_PAYPAL_ORDER_ID_QUERY = defineQuery(`
    }
 `)
 
+export const ORDER_RECEIPT_QUERY = defineQuery(`
+   *[_type == "orders" && _id == $orderId][0]{
+      _id,
+      _createdAt,
+      totalPrice,
+      status,
+      paymentProvider,
+      paymentStatus,
+      paypalOrderId,
+      paypalCaptureId,
+      paidAt,
+      user->{
+         _id,
+         name,
+         surname,
+         email,
+         phone,
+         address
+      },
+      items[] {
+         quantity,
+         dish->{
+            _id,
+            name,
+            "slug": slug.current,
+            price
+         }
+      }
+   }
+`)
+
 export const PROFILE_USER_QUERY = defineQuery(`
    *[_type == "users" && _id == $id][0]{
       _id,

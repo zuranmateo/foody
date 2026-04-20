@@ -99,19 +99,25 @@ export default function CartPage() {
   const totalPrice = cartItems.reduce((total, { dish }) => total + (dish.price ?? 0), 0);
 
   return (
-    <main className="main">
-      <h1>Cart</h1>
+    <main className="">
+      <style>{`
+        body {
+          font-family: Arial, sans-serif;
+          background: #f9f9f9;
+        }
+      `}</style>  
+      <h1 className="h2 mx-auto text-center">Cart</h1>
       {message ? <p>{message}</p> : null}
 
       {loading ? (
         <p>Loading cart...</p>
       ) : cartItems.length === 0 ? (
-        <p>Your cart is empty.</p>
+        <p className="mx-auto text-center mt-50">Your cart is empty.</p>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="">
           {cartItems.map(({ cartIndex, dish }) => (
             <div key={`${dish._id}-${cartIndex}`} className="rounded-xl border p-4">
-              <div className="flex items-start justify-between gap-4">
+              <div className="">
                 <div>
                   <h2>{dish.name}</h2>
                   <p>{dish.category}</p>
@@ -127,7 +133,7 @@ export default function CartPage() {
             </div>
           ))}
 
-          <div className="rounded-xl border p-4">
+          <div className="">
             <p>Total: {totalPrice} EUR</p>
             <Link href="/order" className="inline-flex rounded-xl bg-primary px-4 py-2 text-primary-foreground">
               Continue to payment

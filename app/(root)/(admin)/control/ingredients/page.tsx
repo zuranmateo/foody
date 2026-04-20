@@ -3,6 +3,7 @@ import IngredientStockGraph from "@/components/graphs/IngredientStockGraph";
 import IngredientUsageGraph from "@/components/graphs/IngredientUsageGraph";
 import { DeleteIngredient, UpdateIngredient } from "@/lib/admin-actions";
 import { buildAdminAnalytics, type AnalyticsIngredient, type AnalyticsOrder } from "@/lib/admin-analytics";
+import IngredientExcelImportForm from "@/components/admin/IngredientExcelImportForm";
 import { ADMIN_PAGE_SIZE, getPagination, getTotalPages } from "@/lib/admin-pagination";
 import {
     ADMIN_ANALYTICS_ORDERS_QUERY,
@@ -60,6 +61,7 @@ export default async function IngredientsPage({ searchParams }: IngredientsPageP
                 <IngredientUsageGraph data={analytics.ingredientUsage} />
                 <IngredientStockGraph data={analytics.ingredientStock} />
             </section>
+            <IngredientExcelImportForm />
 
             <div className="space-y-4">
                 {ingredients.length ? (
