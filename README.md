@@ -1,36 +1,162 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Foody
+
+Foody is a modern restaurant ordering platform built with Next.js, Sanity, NextAuth, Tailwind CSS, and PayPal Sandbox. It combines a customer-facing food ordering experience with an admin dashboard for managing dishes, ingredients, orders, and communication.
+
+## Highlights
+
+- Customer menu with categorized dishes and featured meals
+- Local cart flow with checkout preview
+- PayPal Sandbox payment integration
+- Account system with credentials login and GitHub OAuth
+- User profile and order history
+- Admin dashboard for restaurant operations
+- Sanity Studio embedded directly inside the app
+
+## Built With
+
+- Next.js 16
+- React 19
+- TypeScript
+- Tailwind CSS v4
+- NextAuth v5 beta
+- Sanity CMS
+- PayPal Sandbox
+- Resend
+
+## Preview
+
+Main areas of the app:
+
+- `/` landing page
+- `/menu` dish browsing experience
+- `/cart` cart review
+- `/order` checkout flow
+- `/login` and `/register` authentication
+- `/user/[id]` customer account page
+- `/control` admin dashboard
+- `/studio` Sanity Studio
+
+## Features
+
+### Customer Experience
+
+- Browse dishes by category
+- View popular dishes
+- Add meals to cart
+- Review cart totals
+- Complete payment through PayPal Sandbox
+- Access profile and previous orders
+- Download receipts
+
+### Admin Experience
+
+- View dashboard stats
+- Manage dishes
+- Manage ingredients
+- Track and update orders
+- Contact users by email
+- Review recent activity
+
+
+## Environment Variables
+
+Create a `.env.local` file in the root of the project:
+
+```env
+NEXT_PUBLIC_BASE_URL=http://localhost:3000
+
+NEXT_PUBLIC_SANITY_PROJECT_ID=
+NEXT_PUBLIC_SANITY_DATASET=
+NEXT_PUBLIC_SANITY_API_VERSION=2026-04-07
+SANITY_WRITE_TOKEN=
+
+GITHUB_ID=
+GITHUB_SECRET=
+
+NEXT_PUBLIC_PAYPAL_CLIENT_ID=
+PAYPAL_CLIENT_SECRET=
+
+RESEND_API_KEY=
+RESEND_FROM_EMAIL=
+```
 
 ## Getting Started
 
-First, run the development server:
+### 1. Install dependencies
+
+```bash
+npm install
+```
+
+### 2. Configure environment variables
+
+Add the required values to `.env.local`.
+
+### 3. Run the development server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 4. Open the app
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Visit `http://localhost:3000`.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Authentication
 
-## Learn More
+Foody uses [NextAuth](C:/xampp/htdocs/RO/foody/auth.ts) for authentication.
 
-To learn more about Next.js, take a look at the following resources:
+Supported methods:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- Email and password
+- GitHub OAuth
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+User role data is stored in Sanity and used to control admin access.
 
-## Deploy on Vercel
+## Sanity CMS
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Sanity is used as the content and application data layer.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Current schema areas include:
+
+- users
+- dishes
+- ingredients
+- orders
+- reviews
+- sentEmails
+
+The Sanity Studio is available at `/studio`.
+
+## Payments
+
+Checkout is powered by PayPal Sandbox.
+
+- Cart data is collected from local storage
+- Checkout is previewed server-side before payment starts
+- PayPal order creation and capture happen through API routes
+- Successful capture creates an order and can trigger confirmation email sending
+- Receipts are available through the receipt endpoint
+
+## Scripts
+
+```bash
+npm run dev
+npm run build
+npm run start
+npm run lint
+```
+
+## Notes
+
+- This repository uses a newer Next.js version than many tutorials and examples.
+- Local Next.js docs are available in `node_modules/next/dist/docs/`.
+- Sanity write operations require `SANITY_WRITE_TOKEN`.
+- PayPal should use sandbox credentials during development.
+
+## Future Improvements
+
+- Add screenshots or GIF previews
+- Add automated tests
+- Improve type safety around query results
+- Continue unifying older UI sections with the newer design system
