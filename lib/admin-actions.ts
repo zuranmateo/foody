@@ -490,6 +490,8 @@ export async function CreateDish(formData: FormData) {
     const preparationTimeValue = normalizeText(formData.get("preparationTime"), 20);
     const isPopular = String(formData.get("isPopular") ?? "") === "on";
     const isAvailable = String(formData.get("isAvailable") ?? "") === "on";
+    const imageFile = formData.get("image") as File | null;
+
     if (!name || !category || !priceValue) {
         throw new Error("Name, category, and price are required.");
     }
@@ -511,7 +513,7 @@ export async function CreateDish(formData: FormData) {
     const ingredients = buildDishIngredients(formData);
     const slug = await createUniqueDishSlug(name);
 
-    await writeClient.create({
+    const dishData: any = {
         _type: "dishes",
         name,
         slug: {
@@ -525,7 +527,23 @@ export async function CreateDish(formData: FormData) {
         isPopular,
         isAvailable,
         ingredients,
-    });
+    };
+
+    if (imageFile && imageFile instanceof File && imageFile.size > 0) {
+        const asset = await writeClient.assets.upload("image", imageFile, {
+            filename: imageFile.name,
+        });
+
+        dishData.image = {
+            _type: "image",
+            asset: {
+                _type: "reference",
+                _ref: asset._id,
+            },
+        };
+    }
+
+    await writeClient.create(dishData);
 
     revalidatePath("/menu");
     revalidatePath("/control/dishes");

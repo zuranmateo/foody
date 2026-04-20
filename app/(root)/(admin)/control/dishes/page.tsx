@@ -97,7 +97,7 @@ export default async function DishesPage({ searchParams }: DishesPageProps) {
                     </p>
                 </div>
 
-                <form action={CreateDish} className="space-y-5">
+                <form action={CreateDish} className="space-y-5" encType="multipart/form-data">
                     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
                         <label className="space-y-2 text-sm">
                             <span className="text-muted-foreground">Name</span>
@@ -152,6 +152,16 @@ export default async function DishesPage({ searchParams }: DishesPageProps) {
                         <textarea
                             name="description"
                             rows={4}
+                            className="w-full rounded-2xl border bg-background px-3 py-2"
+                        />
+                    </label>
+
+                    <label className="block space-y-2 text-sm">
+                        <span className="text-muted-foreground">Image</span>
+                        <input
+                            name="image"
+                            type="file"
+                            accept="image/*"
                             className="w-full rounded-2xl border bg-background px-3 py-2"
                         />
                     </label>
