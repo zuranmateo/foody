@@ -1,23 +1,47 @@
 import { Suspense } from 'react'
 import { auth } from '@/auth'
 import DishCard from '@/components/cards/DishCard'
-import { DishSkeleton } from '@/components/ui/DishSkeleton'
 import { CATEGORY_DISHES_QUERY, POPULAR_DISHES_QUERY } from '@/sanity/lib/query'
 import { writeClient } from '@/sanity/lib/write-client'
 import { SanityLive } from '@/sanity/lib/live'
 import Image from 'next/image'
 
-async function PopularDishes({ isLoggedIn }: { isLoggedIn: boolean }) {
-  const popDishes = await writeClient.fetch(POPULAR_DISHES_QUERY)
-  return (
-      <div className="items-center max-w-500 shadow-lg p-7 mx-auto">
-      <h1 className="text-5xl font-extrabold uppercase tracking-tight text-red-700 text-center mb-10">
-        Popular dishes
-      </h1>
+type MenuDish = {
+  _id: string
+  [key: string]: unknown
+}
 
-      <div className="grid grid-cols-2 gap-5">
+type CategoryConfig = {
+  title: string
+  value: string
+  empty: string
+}
+
+type CategorySection = CategoryConfig & {
+  dishes: MenuDish[]
+}
+
+async function PopularDishes({ isLoggedIn }: { isLoggedIn: boolean }) {
+  const popDishes = await writeClient.fetch<MenuDish[]>(POPULAR_DISHES_QUERY)
+  return (
+    <section className="rounded-[2rem] border border-border/70 bg-card/90 p-6 shadow-sm sm:p-8">
+      <div className="mb-8 flex flex-col gap-3 text-left sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-sm font-medium uppercase tracking-[0.24em] text-muted-foreground">
+            Crowd favorites
+          </p>
+          <h1 className="mt-2 text-3xl font-semibold uppercase tracking-tight text-foreground sm:text-4xl">
+        Popular dishes
+          </h1>
+        </div>
+        <p className="max-w-xl text-sm text-muted-foreground">
+          The dishes guests keep coming back for.
+        </p>
+      </div>
+
+      <div className="grid gap-5 md:grid-cols-2">
         {popDishes?.length > 0 ? (
-          popDishes.map((popDish: any) => (
+          popDishes.map((popDish) => (
             <DishCard
               key={popDish._id}
               dish={popDish}
@@ -25,10 +49,12 @@ async function PopularDishes({ isLoggedIn }: { isLoggedIn: boolean }) {
             />
           ))
         ) : (
-          <p>Ni popularnih jedi</p>
+          <p className="rounded-2xl border border-dashed border-border px-6 py-10 text-center text-muted-foreground">
+            Ni popularnih jedi
+          </p>
         )}
       </div>
-    </div>
+    </section>
   )
 }
 
@@ -36,22 +62,28 @@ async function CategoryDishes({
   categorySection, 
   isLoggedIn 
 }: { 
-  categorySection: any, 
+  categorySection: CategorySection, 
   isLoggedIn: boolean 
 }) {
   return (
-    <div className="">
-      <h1 className="h2">{categorySection.title}</h1>
-      <div className="w-100 gap-5 m-2">
+    <section className="rounded-[2rem] border border-border/70 bg-card/90 p-6 shadow-sm sm:p-8">
+      <div className="mb-6 flex items-center justify-between gap-4 border-b border-border/70 pb-4">
+        <h2 className="text-2xl font-semibold uppercase tracking-tight text-foreground">
+          {categorySection.title}
+        </h2>
+      </div>
+      <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
         {categorySection.dishes?.length > 0 ? (
-          categorySection.dishes.map((dish: any) => (
+          categorySection.dishes.map((dish) => (
             <DishCard key={dish._id} dish={dish} isLoggedIn={isLoggedIn}/>
           ))
         ) : (
-          <p>{categorySection.empty}</p>
+          <p className="rounded-2xl border border-dashed border-border px-6 py-10 text-center text-muted-foreground md:col-span-2 xl:col-span-3">
+            {categorySection.empty}
+          </p>
         )}
       </div>
-    </div>
+    </section>
   )
 }
 
@@ -59,7 +91,7 @@ export default async function page(){
   const session = await auth()
   const isLoggedIn = !!session?.user
 
-  const categories = [
+  const categories: CategoryConfig[] = [
     { title: 'Pizze', value: 'pica', empty: 'Ni pizza jedi' },
     { title: 'Burgerji', value: 'burger', empty: 'Ni burger jedi' },
     { title: 'Testenine', value: 'testenine', empty: 'Ni testenin' },
@@ -77,50 +109,42 @@ export default async function page(){
   )
 
   return (
-    <div className='text-center px-5'>
-      <style>{`
-        body {
-          font-family: Arial, sans-serif;
-          background: #f9f9f9;
-          margin: 0;
-        }
-      `}</style>
+    <main className="min-h-screen px-4 py-8 sm:px-6 lg:py-12">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-8">
+        <section className="relative overflow-hidden rounded-[2rem] border border-border/70 bg-white shadow-[0_24px_80px_-32px_rgba(15,23,42,0.45)]">
+          <div className="relative flex min-h-80 items-center justify-center px-6 py-12 sm:px-10">
+          
 
-      <div className="p-20 flex justify-center">  
-        <div className="bg-white relative w-800 h-100 rounded-xl overflow-hidden shadow-2xl">
-          <Image
-            src="benner.png"
-            alt="heroBg"
-            width="400" 
-            height="400" 
-          />
-
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-white text-center">
-            <h1 className="mb-6 text-8xl font-extrabold flex uppercase text-red-700 drop-shadow-lg">
+            <div className="absolute inset-0 bg-linear-to-br from-red-900 via-red-800 to-slate-900" />
+            <div className="relative z-10 flex max-w-3xl flex-col items-center text-center text-white">
+              <p className="text-sm font-medium uppercase tracking-[0.34em] text-white/70">
+                Fresh every day
+              </p>
+              <h1 className="mt-4 text-5xl font-extrabold uppercase tracking-tight text-white drop-shadow-lg sm:text-7xl lg:text-8xl">
               MENU
-            </h1>
-            <p className="text-red-300 text-lg drop-shadow-md">
-              Delicious food awaits...
-            </p>
+              </h1>
+              <p className="mt-4 text-sm text-white/80 drop-shadow-md sm:text-lg">
+                Delicious food awaits...
+              </p>
+            </div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      <div className="section">
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div className="rounded-3xl border bg-card p-10 text-center text-muted-foreground">Loading...</div>}>
           <PopularDishes isLoggedIn={isLoggedIn} />
         </Suspense>
-      </div>
 
-      {categorySections.map((categorySection) => (
-        <div className="section" key={categorySection.value}>
-          <Suspense fallback={<div>Loading...</div>}>
+        {categorySections.map((categorySection) => (
+          <Suspense
+            key={categorySection.value}
+            fallback={<div className="rounded-3xl border bg-card p-10 text-center text-muted-foreground">Loading...</div>}
+          >
             <CategoryDishes categorySection={categorySection} isLoggedIn={isLoggedIn} />
           </Suspense>
-        </div>
-      ))}
+        ))}
 
-      <SanityLive />
-    </div>
+        <SanityLive />
+      </div>
+    </main>
   )
 }
