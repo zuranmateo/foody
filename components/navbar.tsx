@@ -55,11 +55,16 @@ export default async function Navbar() {
                 </Link>
             </>
           ):(
-            <button className="navbar mx-5 gap-5">
+            <>
+              <Link href="/menu">
+                  <span className="navbar">Menu</span>
+                </Link>
+                <button className="navbar mx-5 gap-5">
                 <Link href="/login">
                     Login
                 </Link>
             </button>
+            </>
           )}
         </div>
         <SanityLive />
