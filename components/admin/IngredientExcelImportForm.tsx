@@ -74,7 +74,7 @@ export default function IngredientExcelImportForm() {
                 </table>
             </div>
 
-            <form action={formAction} className="mt-5 space-y-4" encType="multipart/form-data">
+            <form action={formAction} className="mt-5 space-y-4">
                 <label className="block space-y-2 text-sm">
                     <span className="text-muted-foreground">Excel file</span>
                     <input
