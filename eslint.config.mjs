@@ -7,8 +7,10 @@ const eslintConfig = defineConfig([
   ...nextTs,
   {
     rules: {
-      "@typescript-eslint/no-explicit-any": "error"
-    },
+  "@typescript-eslint/no-explicit-any": ["error", {
+    argsIgnorePattern: "^props$"
+  }],
+},
   },
   // Override default ignores of eslint-config-next.
   globalIgnores([

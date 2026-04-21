@@ -27,12 +27,28 @@ export default function OrderStatusBar({
                           <XAxis dataKey="label"/>
                           <YAxis />
                           <Tooltip />
-                          <Bar dataKey="value" barSize={40} fill="#31F527">
-                                      <LabelList 
-                                          dataKey={"value"}
-                                          position={'top'}
-                                      />
-                                    </Bar>
+                          <Bar
+                            dataKey="value"
+                            barSize={40}
+                            shape={(props: any) => {
+                                const { x, y, width, height, payload } = props;
+
+                                return (
+                                <rect
+                                    x={x}
+                                    y={y}
+                                    width={width}
+                                    height={height}
+                                    fill={payload.color}
+                                />
+                                );
+                            }}
+                            >
+                            <LabelList 
+                                dataKey="value"
+                                position="top"
+                            />
+                            </Bar>
                         </BarChart>
                       </ResponsiveContainer>
                     </div>
